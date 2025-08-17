@@ -4,6 +4,8 @@ import * as Ctx from './context.ts';
 import pkg from './deno.json' with { type: 'json' };
 import type * as App from './types.ts';
 
+class Option extends CliApp.Commander.Option {}
+
 class Main {
   cmd: CliApp.Command;
 
@@ -23,20 +25,29 @@ class Main {
     await app.run(ctx, opts);
   }
 
-  addOptions() {
-    this.cmd.option('--major', 'Bumps the major version.', false)
-      .option('--minor', 'Bumps the minor version.', false)
-      .option('--patch', 'Bumps the patch version. (default)', false)
-      .option('--prerelease', 'Bumps the prerelease version.', false)
-      .option(
+  addOptions(): this {
+    const options: Option[] = [
+      new Option('--major', 'Bumps the major version.').default(false),
+      new Option('--minor', 'Bumps the minor version.').default(false),
+      new Option('--patch', 'Bumps the patch version. (default)').default(false),
+      new Option('--prerelease', 'Bumps the prerelease version.').default(false),
+      new Option('-r, --release', 'Remove prerelease identifier, or bump patch version for stable release.').default(
+        false,
+      ),
+      new Option(
         '-i, --prerelease-identifier [identifier]',
-        "Specifies the prerelease identifier (e.g., 'alpha', 'beta', 'rc')."
-      )
-      .option(
+        'Specifies the prerelease identifier, or bumps prerelease identifier if not specified',
+      ).choices(['alpha', 'beta', 'rc']),
+      new Option(
         '-n, --dry-run',
         'Displays the new version without writing to the file.',
-        false,
-      );
+      ).default(false),
+      new Option('-c --changelog', 'Update CHANGELOG.md').default(false),
+    ];
+    options.forEach((option) => {
+      this.cmd.addOption(option);
+    });
+    return this;
   }
 }
 
