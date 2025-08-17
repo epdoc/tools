@@ -1,0 +1,10 @@
+{
+  "groups": [
+    {
+      "program": "bump/main.ts",
+      "runtimeArgs": ["run", "--inspect-wait", "--allow-all"],
+      "scriptArgs": "-TNA",
+      "scripts": ["", "-h", "-SA", "-SA --minor", "-SA --prerelease", "-SA --prerelease --prereleaseIdentifier beta"]
+    }
+  ]
+}

@@ -1,5 +1,27 @@
 {
+  "name": "@epdoc/bump",
+  "version": "0.0.2",
+  "description": "Bump semver version",
+  "author": {
+    "name": "James Pravetz",
+    "email": "jpravetz@epdoc.com"
+  },
+  "license": "MIT",
+  "exports": "./main.ts",
   "tasks": {
-    "start": "deno run main.ts"
+    "test": "deno test -RWS",
+    "lint": "deno lint *.ts",
+    "check": "deno check *.ts"
+  },
+  "tests": {
+    "include": [
+      "*.test.ts"
+    ]
+  },
+  "imports": {
+    "@epdoc/cliapp": "jsr:@epdoc/cliapp@^0.10.0",
+    "@epdoc/logger": "jsr:@epdoc/logger@^1002.4.4",
+    "commander": "npm:commander@^14.0.0",
+    "semver": "npm:semver@^7.7.2"
   }
 }

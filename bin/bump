@@ -1,3 +1,10 @@
 #!/bin/bash
+# Get the real path to the script, resolving symlinks
+REAL_SCRIPT_PATH=$(perl -e 'use Cwd "abs_path"; print abs_path(shift)' "${BASH_SOURCE[0]}")
+# Get the directory of the real script
+REAL_SCRIPT_DIR=$(dirname "$REAL_SCRIPT_PATH")
+# Construct the absolute path to main.ts
+MAIN_TS_PATH="$REAL_SCRIPT_DIR/../bump/main.ts"
 
-deno task -C bump/ start -- "$@"
+# Run the deno command from the user's current directory, using an absolute path to the script
+deno run -A --unstable-kv "$MAIN_TS_PATH" "$@"

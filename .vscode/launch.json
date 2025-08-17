@@ -1,0 +1,136 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug bump/main.ts ",
+      "program": "${workspaceFolder}/bump/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-wait",
+        "--allow-all"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "args": [
+        ""
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug bump/main.ts -h",
+      "program": "${workspaceFolder}/bump/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-wait",
+        "--allow-all"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "args": [
+        "-h"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug bump/main.ts -SA",
+      "program": "${workspaceFolder}/bump/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-wait",
+        "--allow-all"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "args": [
+        "-SA"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug bump/main.ts -SA --minor",
+      "program": "${workspaceFolder}/bump/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-wait",
+        "--allow-all"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "args": [
+        "-SA",
+        "--minor"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug bump/main.ts -SA --prerelease",
+      "program": "${workspaceFolder}/bump/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-wait",
+        "--allow-all"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "args": [
+        "-SA",
+        "--prerelease"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug bump/main.ts -SA --prerelease --prereleaseIdentifier beta",
+      "program": "${workspaceFolder}/bump/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--inspect-wait",
+        "--allow-all"
+      ],
+      "attachSimplePort": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "args": [
+        "-SA",
+        "--prerelease",
+        "--prereleaseIdentifier",
+        "beta"
+      ]
+    }
+  ]
+}
