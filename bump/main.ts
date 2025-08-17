@@ -12,8 +12,8 @@ class Main {
   }
 
   init() {
-    this.cmd.addLogging(ctx);
     this.addOptions();
+    this.cmd.addLogging(ctx);
   }
 
   async run(ctx: Ctx.Context): Promise<void> {
@@ -29,7 +29,7 @@ class Main {
       .option('--patch', 'Bumps the patch version. (default)', false)
       .option('--prerelease', 'Bumps the prerelease version.', false)
       .option(
-        '--prerelease-identifier',
+        '-i, --prerelease-identifier <identifier>',
         "Specifies the prerelease identifier (e.g., 'alpha', 'beta', 'rc').",
         'alpha',
       )

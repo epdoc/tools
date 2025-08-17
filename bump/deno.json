@@ -1,7 +1,7 @@
 {
   "name": "@epdoc/bump",
-  "version": "0.0.2",
-  "description": "Bump semver version",
+  "version": "0.0.4-beta.1",
+  "description": "Bump semver version in local deno.json file",
   "author": {
     "name": "James Pravetz",
     "email": "jpravetz@epdoc.com"
