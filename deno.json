@@ -1,21 +1,5 @@
 {
-  "author": {
-    "name": "James Pravetz",
-    "email": "jpravetz@epdoc.com"
-  },
-  "license": "MIT",
-  "tasks": {
-    "test": "deno test -SERW",
-    "lint": "deno lint"
-  },
-  "imports": {
-    "@epdoc/fs": "jsr:@epdoc/fs@^0.2.15",
-    "@epdoc/type": "jsr:@epdoc/type@^1.1.9",
-    "@std/assert": "jsr:@std/assert@^1.0.14"
-  },
-  "fmt": {
-    "singleQuote": true,
-    "lineWidth": 120
-  },
-  "workspace": ["./bump"]
+  "name": "test-pkg",
+  "description": "A test package",
+  "version": "0.2.0"
 }

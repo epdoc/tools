@@ -5,6 +5,6 @@ export type Opts = CliApp.Opts & {
   minor: boolean;
   patch: boolean;
   prerelease: boolean;
-  prereleaseIdentifier: string;
+  prereleaseIdentifier: string | boolean;
   dryRun: boolean;
 };

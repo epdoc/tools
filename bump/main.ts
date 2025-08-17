@@ -29,9 +29,8 @@ class Main {
       .option('--patch', 'Bumps the patch version. (default)', false)
       .option('--prerelease', 'Bumps the prerelease version.', false)
       .option(
-        '-i, --prerelease-identifier <identifier>',
-        "Specifies the prerelease identifier (e.g., 'alpha', 'beta', 'rc').",
-        'alpha',
+        '-i, --prerelease-identifier [identifier]',
+        "Specifies the prerelease identifier (e.g., 'alpha', 'beta', 'rc')."
       )
       .option(
         '-n, --dry-run',

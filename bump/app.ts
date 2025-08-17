@@ -6,7 +6,7 @@ import type * as App from './types.ts';
 
 export class AppMain {
   // Main function to run the version bumping logic.
-  async run(ctx: Ctx.Context, opts: App.Opts) {
+  async run(ctx: Ctx.Context, opts: App.Opts, config?: CliApp.DenoPkg): Promise<string | undefined> {
     const fsDenoFile = new FileSpec(Deno.cwd(), 'deno.json');
 
     // Check if the file exists.
@@ -17,7 +17,7 @@ export class AppMain {
     }
 
     // Read and parse the deno.json file.
-    const config = await fsDenoFile.readJson<CliApp.DenoPkg>();
+    config = config ?? await fsDenoFile.readJson<CliApp.DenoPkg>();
     const currentVersion = config.version;
 
     if (!currentVersion) {
@@ -25,31 +25,76 @@ export class AppMain {
       return;
     }
 
+    const IDENTIFIER_ORDER = ['alpha', 'beta', 'rc'];
     let newVersion: string | null = null;
-    const identifier = opts.prereleaseIdentifier as semver.ReleaseType;
-    let bumpType: semver.ReleaseType = 'patch';
-
-    // Determine the bump type. The order of checks is important here.
-    if (opts.major) {
-      bumpType = 'major';
-    } else if (opts.minor) {
-      bumpType = 'minor';
-    } else if (opts.prerelease) {
-      bumpType = 'prerelease';
-    }
-
-    // Check if the prerelease identifier is valid.
-    if (
-      bumpType === 'prerelease' && identifier &&
-      !['alpha', 'beta', 'rc'].includes(identifier)
-    ) {
-      ctx.log.error.error('Invalid prerelease identifier').value(identifier).text('Must be "alpha", "beta", or "rc".')
-        .emit();
+    const parsedVersion = semver.parse(currentVersion);
+    if (!parsedVersion) {
+      ctx.log.error.error('Invalid version string').value(currentVersion).emit();
       return;
     }
 
-    // Use semver.inc to get the new version.
-    newVersion = semver.inc(currentVersion, bumpType, identifier);
+    const { major, minor, patch } = parsedVersion;
+    const currentIdentifier = parsedVersion.prerelease[0] as string | undefined;
+    const newIdentifier = opts.prereleaseIdentifier;
+
+    if (opts.major) {
+      newVersion = semver.inc(currentVersion, 'major');
+    } else if (opts.minor) {
+      newVersion = semver.inc(currentVersion, 'minor');
+    } else if (opts.patch) {
+      if (parsedVersion.prerelease.length > 0) {
+        newVersion = `${major}.${minor}.${patch + 1}`;
+      } else {
+        newVersion = semver.inc(currentVersion, 'patch');
+      }
+    } else if (newIdentifier) {
+      if (typeof newIdentifier === 'string') {
+        // User provided an identifier, e.g., -i rc
+        const currentIndex = currentIdentifier ? IDENTIFIER_ORDER.indexOf(currentIdentifier) : -1;
+        const newIndex = IDENTIFIER_ORDER.indexOf(newIdentifier);
+        if (newIndex < 0) {
+          ctx.log.error.error('Invalid prerelease identifier').value(newIdentifier).emit();
+          return;
+        }
+        if (newIdentifier === currentIdentifier) {
+          ctx.log.warn.warn('Identifier is already at').value(newIdentifier).emit();
+          return;
+        }
+        if (newIndex < currentIndex) {
+          // New identifier is lower than current one, bump patch
+          newVersion = `${major}.${minor}.${patch + 1}-${newIdentifier}.0`;
+        } else {
+          // New identifier is higher or there was no previous one
+          if (currentIdentifier) {
+            newVersion = `${major}.${minor}.${patch}-${newIdentifier}.0`;
+          } else {
+            newVersion = `${major}.${minor}.${patch + 1}-${newIdentifier}.0`;
+          }
+        }
+      } else {
+        // User provided -i without an identifier
+        if (currentIdentifier) {
+          const currentIndex = IDENTIFIER_ORDER.indexOf(currentIdentifier);
+          if (currentIndex < IDENTIFIER_ORDER.length - 1) {
+            const nextIdentifier = IDENTIFIER_ORDER[currentIndex + 1];
+            newVersion = `${major}.${minor}.${patch}-${nextIdentifier}.0`;
+          } else {
+            // Already at 'rc', so bump patch and start new alpha cycle
+            newVersion = `${major}.${minor}.${patch + 1}-alpha.0`;
+          }
+        } else {
+          // No current identifier, start with alpha for next patch
+          newVersion = `${major}.${minor}.${patch + 1}-${IDENTIFIER_ORDER[0]}.0`;
+        }
+      }
+    } else {
+      // Default behavior
+      if (currentIdentifier) {
+        newVersion = semver.inc(currentVersion, 'prerelease');
+      } else {
+        newVersion = semver.inc(currentVersion, 'patch');
+      }
+    }
 
     // Handle the case where the new version could not be calculated.
     if (!newVersion) {
@@ -70,5 +115,6 @@ export class AppMain {
     } else {
       ctx.log.info.h1('Dry run complete. No changes were made to the file.').emit();
     }
+    return newVersion;
   }
 }
