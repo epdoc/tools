@@ -1,5 +1,12 @@
 {
-  "name": "test-pkg",
-  "description": "A test package",
-  "version": "0.2.0"
+  "description": "Tools",
+  "imports": {
+    "@std/testing/bdd": "jsr:@std/testing@^0.225.3/bdd",
+    "@std/expect": "jsr:@std/expect@^0.224.1"
+  },
+  "workspace": ["bump"],
+  "fmt": {
+    "singleQuote": true,
+    "lineWidth": 120
+  }
 }
