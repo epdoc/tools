@@ -42,7 +42,7 @@ class Main {
         '-n, --dry-run',
         'Displays the new version without writing to the file.',
       ).default(false),
-      new Option('-c --changelog', 'Update CHANGELOG.md').default(false),
+      new Option('-c, --changelog [message]', 'Update CHANGELOG.md with optional message').default(false),
     ];
     options.forEach((option) => {
       this.cmd.addOption(option);

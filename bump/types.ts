@@ -10,5 +10,5 @@ export type Opts =
     release: boolean;
     prereleaseIdentifier: string | boolean;
     dryRun: boolean;
-    changelog: boolean;
+    changelog: boolean | string;
   }>;

@@ -5,9 +5,10 @@ export class Changelog {
   fs: FileSpec = new FileSpec(Deno.cwd(), 'CHANGELOG.md');
   header = '# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n';
 
-  async update(version: string): Promise<void> {
+  async update(version: string, message?: string): Promise<void> {
     const date = format(new Date(), 'yyyy-MM-dd');
-    const newSection = `## [${version}] - ${date}\n\n- Add details here\n\n`;
+    const msg = message ? `- ${message}` : '- Add details here';
+    const newSection = `## [${version}] - ${date}\n\n${msg}\n\n`;
 
     const isFile = await this.fs.getIsFile();
     if (isFile) {

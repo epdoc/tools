@@ -36,7 +36,8 @@ export class AppMain {
         fsDenoFile.writeJson(config);
         if (opts.changelog) {
           const changelog = new Changelog();
-          await changelog.update(newVersion);
+          const message = typeof opts.changelog === 'string' ? opts.changelog : undefined;
+          await changelog.update(newVersion, message);
         }
         ctx.log.info.h1('Updated').relative(fsDenoFile.path).h1('with new version').emit();
       } else {

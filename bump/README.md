@@ -23,7 +23,7 @@ and updates the file.
 | `-r, --release`                            | Remove prerelease identifier, or bump patch version for stable release.                                                        |
 | `-i, --prerelease-identifier [identifier]` | Specifies the prerelease identifier, or bumps prerelease identifier if not specified. Valid options are `alpha`, `beta`, `rc`. |
 | `-n, --dry-run`                            | Displays the new version without modifying the `deno.json` file. Useful for previewing changes.                                |
-| `-c, --changelog`                          | Update CHANGELOG.md with a placeholder comment.                                                                                |
+| `-c, --changelog [message]`                | Update CHANGELOG.md with `message` or a placeholder comment.                                                                   |
 
 ## Examples
 
