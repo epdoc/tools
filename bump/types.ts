@@ -11,4 +11,6 @@ export type Opts =
     prereleaseIdentifier: string | boolean;
     dryRun: boolean;
     changelog: boolean | string;
+    git: boolean;
+    tag: boolean;
   }>;

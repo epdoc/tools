@@ -50,6 +50,8 @@ class Main {
         'Displays the new version without writing to the file.',
       ).default(false),
       new Option('-c, --changelog [message]', 'Update CHANGELOG.md with optional message').default(false),
+      new Option('-g, --git', 'Commit and push changes to git.').default(false),
+      new Option('-t, --tag', 'Create and push a git tag. Implies --git.').default(false),
     ];
     options.forEach((option) => {
       this.cmd.addOption(option);
