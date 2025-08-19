@@ -73,9 +73,21 @@ export class AppMain {
         newVersion = semver.inc(version, 'patch');
       }
     } else if (opts.major) {
-      newVersion = semver.inc(version, 'major');
+      const newIdentifier = opts.prereleaseIdentifier;
+      if (newIdentifier) {
+        const identifier = typeof newIdentifier === 'string' ? newIdentifier : 'alpha';
+        newVersion = semver.inc(version, 'premajor', identifier);
+      } else {
+        newVersion = semver.inc(version, 'major');
+      }
     } else if (opts.minor) {
-      newVersion = semver.inc(version, 'minor');
+      const newIdentifier = opts.prereleaseIdentifier;
+      if (newIdentifier) {
+        const identifier = typeof newIdentifier === 'string' ? newIdentifier : 'alpha';
+        newVersion = semver.inc(version, 'preminor', identifier);
+      } else {
+        newVersion = semver.inc(version, 'minor');
+      }
     } else if (opts.patch) {
       newVersion = semver.inc(version, 'patch');
     } else if (newIdentifier) {

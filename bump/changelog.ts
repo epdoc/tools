@@ -8,7 +8,7 @@ export class Changelog {
   async update(version: string, message?: string): Promise<void> {
     const date = format(new Date(), 'yyyy-MM-dd');
     const msg = message ? `- ${message}` : '- Add details here';
-    const newSection = `## [${version}] - ${date}\n\n${msg}\n\n`;
+    const newSection = `## [${version}] - ${date}\n\n${msg}`;
 
     const isFile = await this.fs.getIsFile();
     if (isFile) {

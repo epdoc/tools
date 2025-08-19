@@ -86,4 +86,36 @@ describe('AppMain', () => {
       expect(newVersion).toBe('0.3.0');
     });
   });
+
+  describe('--major and --minor flags with prerelease', () => {
+    it('should bump minor version and start new prerelease cycle', () => {
+      const newVersion = AppMain.increment(ctx, '2.0.5-alpha.2', { minor: true, prereleaseIdentifier: 'alpha' });
+      expect(newVersion).toBe('2.1.0-alpha.0');
+    });
+
+    it('should bump major version and start new prerelease cycle', () => {
+      const newVersion = AppMain.increment(ctx, '2.0.5-alpha.2', { major: true, prereleaseIdentifier: 'alpha' });
+      expect(newVersion).toBe('3.0.0-alpha.0');
+    });
+
+    it('should bump minor version and graduate to stable', () => {
+      const newVersion = AppMain.increment(ctx, '2.0.5-alpha.2', { minor: true });
+      expect(newVersion).toBe('2.1.0');
+    });
+
+    it('should bump major version and graduate to stable', () => {
+      const newVersion = AppMain.increment(ctx, '2.0.5-alpha.2', { major: true });
+      expect(newVersion).toBe('3.0.0');
+    });
+
+    it('should bump minor version with specified identifier', () => {
+      const newVersion = AppMain.increment(ctx, '2.0.5-alpha.2', { minor: true, prereleaseIdentifier: 'beta' });
+      expect(newVersion).toBe('2.1.0-beta.0');
+    });
+
+    it('should bump major version with specified identifier', () => {
+      const newVersion = AppMain.increment(ctx, '2.0.5-alpha.2', { major: true, prereleaseIdentifier: 'beta' });
+      expect(newVersion).toBe('3.0.0-beta.0');
+    });
+  });
 });

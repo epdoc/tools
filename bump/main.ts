@@ -1,4 +1,5 @@
 import * as CliApp from '@epdoc/cliapp';
+import { Argument } from 'commander';
 import { AppMain } from './app.ts';
 import * as Ctx from './context.ts';
 import pkg from './deno.json' with { type: 'json' };
@@ -20,9 +21,15 @@ class Main {
 
   async run(ctx: Ctx.Context): Promise<void> {
     const opts = await this.cmd.parseOpts() as App.Opts;
+    const args = this.cmd.args;
     CliApp.configureLogging(ctx, opts);
-    const app = new AppMain();
-    await app.run(ctx, opts);
+    if (args.length) {
+      ctx.log.info.h1('Using version from command line rather than using deno.json.').emit();
+      AppMain.increment(ctx, args[0], opts);
+    } else {
+      const app = new AppMain();
+      await app.run(ctx, opts);
+    }
   }
 
   addOptions(): this {
@@ -47,6 +54,12 @@ class Main {
     options.forEach((option) => {
       this.cmd.addOption(option);
     });
+    const arg = new Argument(
+      '[version]',
+      'Optional version string to bump ' +
+        '(this is for testing, otherwise will use deno.json file.)',
+    );
+    this.cmd.addArgument(arg);
     return this;
   }
 }

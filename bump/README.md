@@ -87,3 +87,21 @@ Use `--patch` to finalize a prerelease version.
 bump --patch
 # new version: 0.0.7
 ```
+
+### Bumping Major/Minor with Pre-release
+
+You can combine the `--major` or `--minor` flags with the `-i` flag to bump the version and start a new pre-release cycle.
+
+- Bump minor and start an `alpha` pre-release:
+  ```sh
+  # current version: 1.2.3
+  bump --minor -i alpha
+  # new version: 1.3.0-alpha.0
+  ```
+
+- Bump major on a pre-release version and start a new `beta` pre-release:
+  ```sh
+  # current version: 2.0.5-alpha.2
+  bump --major -i beta
+  # new version: 3.0.0-beta.0
+  ```

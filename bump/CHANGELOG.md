@@ -2,11 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2025-08-19
+
+- Added `-i` now adds alpha.0 when used with major, mnor or patch
+
 ## [0.3.3] - 2025-08-18
 
 - Added optional changelog string option
-
-
 
 ## [0.3.2] - 2025-08-17
 
