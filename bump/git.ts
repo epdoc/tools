@@ -28,7 +28,8 @@ ${err}`);
   }
 
   async commit(message: string): Promise<void> {
-    await this.run(['commit', '-m', message]);
+    const msg = message.replace(/\n/g, ' ');
+    await this.run(['commit', '-m', msg]);
   }
 
   async tag(version: string, message?: string): Promise<void> {
