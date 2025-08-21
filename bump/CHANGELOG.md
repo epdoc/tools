@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.6] - 2025-08-21
+
+- Added newline support inside commit and changelog messages.
+
 ## [0.3.5] - 2025-08-19
 
 - Added git add, commit, push, tag options
