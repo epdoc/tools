@@ -23,10 +23,13 @@ class Main {
     const opts = await this.cmd.parseOpts() as App.Opts;
     const args = this.cmd.args;
     CliApp.configureLogging(ctx, opts);
-    if (args.length) {
+    if (opts.test) {
       ctx.log.info.h1('Using version from command line rather than using deno.json.').emit();
-      AppMain.increment(ctx, args[0], opts);
+      AppMain.increment(ctx, opts.test, opts);
     } else {
+      if (args.length) {
+        opts.changelog = args;
+      }
       const app = new AppMain();
       await app.run(ctx, opts);
     }
@@ -49,17 +52,18 @@ class Main {
         '-n, --dry-run',
         'Displays the new version without writing to the file.',
       ).default(false),
-      new Option('-c, --changelog [message]', 'Update CHANGELOG.md with optional message').default(false),
+      new Option('-c, --changelog', 'Update CHANGELOG.md with the commit message assembled from arguments.')
+        .default(false),
       new Option('-g, --git', 'Commit and push changes to git.').default(false),
       new Option('-t, --tag', 'Create and push a git tag. Implies --git.').default(false),
+      new Option('--test [version]', 'Optional version string to bump for testing.'),
     ];
     options.forEach((option) => {
       this.cmd.addOption(option);
     });
     const arg = new Argument(
-      '[version]',
-      'Optional version string to bump ' +
-        '(this is for testing, otherwise will use deno.json file.)',
+      '[message]',
+      'Optional message string(s) to be used for the git commit and CHANGELOG.md entries.',
     );
     this.cmd.addArgument(arg);
     return this;

@@ -10,7 +10,8 @@ export type Opts =
     release: boolean;
     prereleaseIdentifier: string | boolean;
     dryRun: boolean;
-    changelog: boolean | string;
+    changelog: string[];
     git: boolean;
     tag: boolean;
+    test: string;
   }>;

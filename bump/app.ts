@@ -1,5 +1,6 @@
 import type * as CliApp from '@epdoc/cliapp';
 import { FileSpec } from '@epdoc/fs';
+import { _ } from '@epdoc/type';
 import { assert } from '@std/assert';
 import * as semver from 'semver';
 import { Changelog } from './changelog.ts';
@@ -35,28 +36,26 @@ export class AppMain {
       if (!opts.dryRun) {
         config.version = newVersion;
         fsDenoFile.writeJson(config);
-        let message: string | undefined;
-        if (opts.changelog) {
+        if (_.isNonEmptyArray(opts.changelog)) {
           const changelog = new Changelog(config.name);
-          message = typeof opts.changelog === 'string' ? opts.changelog : undefined;
-          await changelog.update(newVersion, message);
+          await changelog.update(newVersion, opts.changelog);
         }
         ctx.log.info.h1('Updated').relative(fsDenoFile.path).h1('with new version').emit();
-        await this.#gitOps(ctx, opts, newVersion, message);
+        await this.#gitOps(ctx, opts, newVersion, opts.changelog);
       } else {
         ctx.log.info.h1('Dry run complete. No changes were made to the file.').emit();
       }
     }
   }
 
-  async #gitOps(ctx: Ctx.Context, opts: App.Opts, version: string, message?: string) {
+  async #gitOps(ctx: Ctx.Context, opts: App.Opts, version: string, message?: string[]) {
     if (opts.git || opts.tag) {
       const git = new Git(ctx);
       await git.add();
-      const msg = message ? message : `Bump version to ${version}`;
-      await git.commit(msg);
+      const msgs: string[] = _.isNonEmptyArray(message) ? message : [`Bump version to ${version}`];
+      await git.commit(msgs);
       if (opts.tag) {
-        await git.tag(version, msg);
+        await git.tag(version, _.isNonEmptyArray(message) ? message[0] : undefined);
       }
       await git.push(opts.tag || false);
     }

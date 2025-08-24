@@ -27,9 +27,8 @@ ${err}`);
     await this.run(['add', '.']);
   }
 
-  async commit(message: string): Promise<void> {
+  async commit(msgs: string[]): Promise<void> {
     const args = ['commit'];
-    const msgs = message.split('\n');
     msgs.forEach((msg) => {
       args.push('-m');
       args.push(msg);

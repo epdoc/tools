@@ -1,4 +1,5 @@
 import { FileSpec } from '@epdoc/fs';
+import { _ } from '@epdoc/type';
 import { format } from '@std/datetime';
 
 export class Changelog {
@@ -9,13 +10,12 @@ export class Changelog {
     this.header = `# Changelog for ${name}\n\nAll notable changes to this project will be documented in this file.\n\n`;
   }
 
-  async update(version: string, message?: string): Promise<void> {
+  async update(version: string, message?: string[]): Promise<void> {
     const date = format(new Date(), 'yyyy-MM-dd');
     // let msg = '- Add details here';
-    const msgs = [];
-    if (message) {
-      const smsgs = message.split('\n');
-      smsgs.forEach((msg) => {
+    const msgs: string[] = [];
+    if (_.isNonEmptyArray(message)) {
+      message.forEach((msg) => {
         msgs.push('- ' + msg);
       });
     } else {
