@@ -62,7 +62,7 @@ class Main {
       this.cmd.addOption(option);
     });
     const arg = new Argument(
-      '[message]',
+      '[message...]',
       'Optional message string(s) to be used for the git commit and CHANGELOG.md entries.',
     );
     this.cmd.addArgument(arg);
