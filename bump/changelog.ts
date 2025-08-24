@@ -21,7 +21,7 @@ export class Changelog {
     } else {
       msgs.push('- add details here');
     }
-    const newSection = `## [${version}] - ${date}\n\n${msgs.join('\n')}\n`;
+    const newSection = [`## [${version}] - ${date}`, '', ...msgs];
 
     const isFile = await this.fs.getIsFile();
     if (isFile) {
@@ -29,7 +29,7 @@ export class Changelog {
       const firstH2Index = lines.findIndex((line) => line.startsWith('## '));
 
       if (firstH2Index !== -1) {
-        lines.splice(firstH2Index, 0, newSection, '');
+        lines.splice(firstH2Index, 0, ...newSection, '');
         await this.fs.write(lines);
       } else {
         await this.fs.write(`${this.header}${newSection}\n`);
