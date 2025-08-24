@@ -3,15 +3,25 @@ import { format } from '@std/datetime';
 
 export class Changelog {
   fs: FileSpec = new FileSpec(Deno.cwd(), 'CHANGELOG.md');
-  header = '# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n';
+  header: string;
+
+  constructor(name: string) {
+    this.header = `# Changelog for ${name}\n\nAll notable changes to this project will be documented in this file.\n\n`;
+  }
 
   async update(version: string, message?: string): Promise<void> {
     const date = format(new Date(), 'yyyy-MM-dd');
-    let msg = '- Add details here';
+    // let msg = '- Add details here';
+    const msgs = [];
     if (message) {
-      msg = `- ${message.replace(/\n/g, '\n- ')}`;
+      const smsgs = message.split('\n');
+      smsgs.forEach((msg) => {
+        msgs.push('- ' + msg);
+      });
+    } else {
+      msgs.push('- add details here');
     }
-    const newSection = `## [${version}] - ${date}\n\n${msg}`;
+    const newSection = `## [${version}] - ${date}\n\n${msgs.join('\n')}\n`;
 
     const isFile = await this.fs.getIsFile();
     if (isFile) {

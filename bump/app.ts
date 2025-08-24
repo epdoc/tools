@@ -37,7 +37,7 @@ export class AppMain {
         fsDenoFile.writeJson(config);
         let message: string | undefined;
         if (opts.changelog) {
-          const changelog = new Changelog();
+          const changelog = new Changelog(config.name);
           message = typeof opts.changelog === 'string' ? opts.changelog : undefined;
           await changelog.update(newVersion, message);
         }
