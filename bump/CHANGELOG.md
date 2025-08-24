@@ -7,24 +7,6 @@ All notable changes to this project will be documented in this file.
 - Fixed formatting for changelog and commit messages.
 - Added deno.json name to CHANGELOG.md virgin header.
 
-## [0.3.10] - 2025-08-24
-
-- Fixed formatting for changelog and commit messages.
-Added deno.json name to CHANGELOG.md virgin header.
-
-## [0.3.9] - 2025-08-24
-
-- Fixed formatting for changelog and commit messages.
-- Added deno.json name to CHANGELOG.md virgin header.
-
-## [0.3.8] - 2025-08-24
-
-- Fixed formatting for changelog and commit messages.\nAdded deno.json name to CHANGELOG.md virgin header.
-
-## [0.3.7] - 2025-08-24
-
-- Fixed formatting for changelog and commit messages.\nAdded deno.json name to CHANGELOG.md virgin header.
-
 ## [0.3.6] - 2025-08-21
 
 - Added newline support inside commit and changelog messages.
