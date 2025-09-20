@@ -1,9 +1,9 @@
 import * as CliApp from '@epdoc/cliapp';
 import { Argument } from 'commander';
-import { AppMain } from './app.ts';
-import * as Ctx from './context.ts';
 import pkg from './deno.json' with { type: 'json' };
-import type * as App from './types.ts';
+import { AppMain } from './src/app.ts';
+import * as Ctx from './src/context.ts';
+import type * as App from './src/types.ts';
 
 class Option extends CliApp.Commander.Option {}
 

@@ -14,6 +14,9 @@ All notable changes to this project will be documented in this file.
 ## [0.3.5] - 2025-08-19
 
 - Added git add, commit, push, tag options
+
+## [0.3.4] - 2025-08-19
+
 - Added `-i` now adds alpha.0 when used with major, mnor or patch
 
 ## [0.3.3] - 2025-08-18

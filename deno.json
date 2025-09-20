@@ -4,7 +4,7 @@
     "@std/testing/bdd": "jsr:@std/testing@^0.225.3/bdd",
     "@std/expect": "jsr:@std/expect@^0.224.1"
   },
-  "workspace": ["bump"],
+  "workspace": ["./packages/*"],
   "fmt": {
     "singleQuote": true,
     "lineWidth": 120

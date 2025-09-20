@@ -90,7 +90,8 @@ bump --patch
 
 ### Bumping Major/Minor with Pre-release
 
-You can combine the `--major` or `--minor` flags with the `-i` flag to bump the version and start a new pre-release cycle.
+You can combine the `--major` or `--minor` flags with the `-i` flag to bump the version and start a new pre-release
+cycle.
 
 - Bump minor and start an `alpha` pre-release:
   ```sh
