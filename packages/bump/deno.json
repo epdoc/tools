@@ -1,6 +1,6 @@
 {
   "name": "@epdoc/bump",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "description": "Bump semver version in local deno.json file",
   "author": {
     "name": "James Pravetz",
@@ -12,8 +12,8 @@
   },
   "tasks": {
     "test": "deno test -RWS",
-    "lint": "deno lint *.ts",
-    "check": "deno check *.ts"
+    "lint": "deno lint main.ts src test",
+    "check": "deno check src main.ts test"
   },
   "tests": {
     "include": [
@@ -21,7 +21,7 @@
     ]
   },
   "imports": {
-    "@epdoc/cliapp": "jsr:@epdoc/cliapp@^0.10.1",
+    "@epdoc/cliapp": "jsr:@epdoc/cliapp@^0.10.2",
     "@epdoc/fs": "jsr:@epdoc/fs@^0.2.17",
     "@epdoc/logger": "jsr:@epdoc/logger@^1002.4.6",
     "@epdoc/type": "jsr:@epdoc/type@^1.1.13",

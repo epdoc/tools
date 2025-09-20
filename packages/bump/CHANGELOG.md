@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.12] - 2025-09-19
+
+- Added workspace detection to add workspace name to tag.
+- Updated dependencies and Deno 2.5.1 requirements.
+
 ## [0.3.11] - 2025-08-24
 
 - Fixed formatting for changelog and commit messages.
