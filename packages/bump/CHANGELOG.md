@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.14] - 2025-10-06
+
+- Moved project to @epdoc/tools repo
+
 ## [0.3.13] - 2025-10-06
 
 - feat(bump): include workspace files in git commit and update docs.

@@ -1,6 +1,6 @@
 {
   "name": "@epdoc/bump",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "description": "Bump semver version in local deno.json file",
   "author": {
     "name": "James Pravetz",
@@ -13,7 +13,8 @@
   "tasks": {
     "test": "deno test -RWS",
     "lint": "deno lint main.ts src test",
-    "check": "deno check src main.ts test"
+    "check": "deno check src main.ts test",
+    "install": "deno install --global -A -f --config deno.json --name bump main.ts"
   },
   "tests": {
     "include": [
