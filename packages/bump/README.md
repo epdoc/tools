@@ -8,7 +8,7 @@ to CHANGELOG.md.
 
 ## Global Installation
 
-You can install `bump` globally on your machine using `deno install`:
+You can install `bump` globally on your machine using `deno install` (untested):
 
 ```sh
 deno install -A -f --name bump https://deno.land/x/epdoc_tools/packages/bump/main.ts

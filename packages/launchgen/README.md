@@ -29,8 +29,8 @@ projects, automatically detecting the runtime and generating the appropriate lau
 First, you need to get the source code. You can either clone the repository or download the source code as a zip file.
 
 ```bash
-git clone https://github.com/epdoc/launchgen.git
-cd launchgen
+git clone https://github.com/epdoc/tools.git
+cd tools/packages/launchgen
 ```
 
 To make the `launchgen` script globally available, you can install it using the following command:
