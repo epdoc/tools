@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.15] - 2025-10-06
+
+- Updated dependencies
+
 ## [0.3.14] - 2025-10-06
 
 - Moved project to @epdoc/tools repo
