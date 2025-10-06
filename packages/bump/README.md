@@ -1,8 +1,24 @@
 # @epdoc/bump Version Bumping Tool
 
+> This tool is part of the [`@epdoc/tools`](../../README.md) repository.
+
 A command-line tool to simplify version bumping for Deno projects. It modifies the `version` field in your `deno.json`
 file according to the rules of semantic versioning. Supports monorepos. Can also automatically add a placeholder comment
 to CHANGELOG.md.
+
+## Global Installation
+
+You can install `bump` globally on your machine using `deno install`:
+
+```sh
+deno install -A -f --name bump https://deno.land/x/epdoc_tools/packages/bump/main.ts
+```
+
+Or, if you have the repository cloned locally, you can run the `install` task from the `packages/bump` directory:
+
+```sh
+deno task install
+```
 
 ## Usage
 
