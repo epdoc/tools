@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.13] - 2025-10-06
+
+- feat(bump): include workspace files in git commit and update docs.
+
 ## [0.3.12] - 2025-09-19
 
 - Added workspace detection to add workspace name to tag.

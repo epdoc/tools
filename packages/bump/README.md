@@ -1,7 +1,8 @@
-# `bump` Version Bumping Tool
+# @epdoc/bump Version Bumping Tool
 
 A command-line tool to simplify version bumping for Deno projects. It modifies the `version` field in your `deno.json`
-file according to the rules of semantic versioning. Can also automatically add a placeholder comment to CHANGELOG.md.
+file according to the rules of semantic versioning. Supports monorepos. Can also automatically add a placeholder comment
+to CHANGELOG.md.
 
 ## Usage
 
@@ -10,7 +11,8 @@ bump [options]
 ```
 
 The tool reads the `deno.json` file in the current directory, calculates the new version based on the provided options,
-and updates the file.
+and updates the file. By default, it increments the lowest precedence part of the version. The following flags can be
+used to override this behavior.
 
 ## Options
 
@@ -18,12 +20,43 @@ and updates the file.
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
 | `--major`                                  | Bumps the major version (e.g., `1.2.3` -> `2.0.0`).                                                                            |
 | `--minor`                                  | Bumps the minor version (e.g., `1.2.3` -> `1.3.0`).                                                                            |
-| `--patch`                                  | Bumps the patch version (e.g., `1.2.3` -> `1.2.4`). This is the default action if no other version-bumping flag is provided.   |
-| `--prerelease`                             | Bumps the prerelease version.                                                                                                  |
+| `--patch`                                  | Bumps the patch version (e.g., `1.2.3` -> `1.2.4`).                                                                            |
+| `--prerelease`                             | Bumps the prerelease version (e.g., `1.2.3-alpha.0` -> `1.2.3-alpha.1`). This is the default action for pre-release versions.  |
 | `-r, --release`                            | Remove prerelease identifier, or bump patch version for stable release.                                                        |
 | `-i, --prerelease-identifier [identifier]` | Specifies the prerelease identifier, or bumps prerelease identifier if not specified. Valid options are `alpha`, `beta`, `rc`. |
 | `-n, --dry-run`                            | Displays the new version without modifying the `deno.json` file. Useful for previewing changes.                                |
 | `-c, --changelog [message]`                | Update CHANGELOG.md with `message` or a placeholder comment.                                                                   |
+| `-g, --git`                                | Commit and push changes to git.                                                                                                |
+| `--tag`                                    | Create and push a git tag.                                                                                                     |
+
+## Git Integration
+
+The `bump` tool can also help with git operations.
+
+- Use the `-g` flag to automatically commit and push the version change to your git repository.
+- Use the `--tag` flag to create a git tag for the new version.
+
+When running in a workspace, if any of the following top-level files have been modified, they will be included in the
+commit:
+
+- `deno.lock`
+- `deno.json`
+- `.gitignore`
+- `launch.config.json`
+- Any file ending in `.md`
+- Any file in the `docs/` directory
+
+### Example
+
+```sh
+# current version: 1.2.3
+bump --patch -g --tag
+# new version: 1.2.4
+# git commit -m "Bump version to 1.2.4"
+# git tag -a v1.2.4 -m "v1.2.4"
+# git push
+# git push --tags
+```
 
 ## Examples
 
