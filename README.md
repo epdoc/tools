@@ -5,6 +5,7 @@ A collection of command-line tools for Deno projects.
 ## Packages
 
 - [@epdoc/bump](./packages/bump/README.md): A tool for version bumping `deno.json` files.
+- [@epdoc/launchgen](./packages/launchgen/README.md): Generate or update a `launch.json` file for use with VSCode.
 
 ## Installation
 

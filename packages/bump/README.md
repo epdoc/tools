@@ -1,4 +1,4 @@
-# @epdoc/bump Version Bumping Tool
+# @epdoc/bump
 
 > This tool is part of the [`@epdoc/tools`](../../README.md) repository.
 

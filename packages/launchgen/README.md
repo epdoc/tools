@@ -1,5 +1,7 @@
 # @epdoc/launchgen
 
+> This tool is part of the [`@epdoc/tools`](../../README.md) repository.
+
 Generate or update a `launch.json` file for use with VSCode. This script is designed to work with both Deno and Node.js
 projects, automatically detecting the runtime and generating the appropriate launch configurations.
 
@@ -109,7 +111,8 @@ conventions:
 
 ## Default Configuration
 
-`launchgen` provides a default configuration for your `launch.json` file, even if you don't have a `launch.config.json` file. The default values are:
+`launchgen` provides a default configuration for your `launch.json` file, even if you don't have a `launch.config.json`
+file. The default values are:
 
 ```json
 {
@@ -121,7 +124,8 @@ conventions:
 }
 ```
 
-You can override these defaults by creating a `launch.config.json` file in your project root and specifying your own values.
+You can override these defaults by creating a `launch.config.json` file in your project root and specifying your own
+values.
 
 The script works out of the box for most projects, but you can create a `launch.config.json` file in your project root
 for more advanced configurations.
@@ -195,8 +199,16 @@ configuration groups.
 **Global Settings:**
 
 - `port`: The port to use for debugging. Defaults to `9229`.
-- `console`: The type of console to use. Can be `internalConsole`, `integratedTerminal`, or `externalTerminal`. Defaults
-  to `integratedTerminal`.
+- `console`: Controls where the debuggee's (the application being debugged) **output (stdout/stderr)** will appear. The
+  value `internalConsole` directs the output to the **VS Code Debug Console**. Other common values include:
+  - `integratedTerminal`: Uses VS Code's built-in terminal.
+  - `externalTerminal`: Opens a new external terminal window.
+
+If the application requires **user input** via `stdin` (like a command-line utility), the user **should** change console
+to `integratedTerminal` or `externalTerminal`, as the `internalConsole` cannot handle standard input.
+
+A user might prefer `integratedTerminal` to keep the application's output separate from the Debug Console's internal
+messages (like logpoints or variable evaluations).
 
 **Auto-Discovered Test Settings (`tests`):**
 
@@ -228,21 +240,8 @@ arguments defined in `launch.config.json`.
 
 The arguments from `tests.runtimeArgs` are always added after the default arguments and the file path.
 
-## Extending Launchgen
-
-The `LaunchGenerator` class is designed to be extended. The following methods are `protected` and can be overridden in a
-subclass:
-
-- `detectRuntime()`
-- `loadConfigs()`
-- `filterExisting()`
-- `addWorkspaceFiles()`
-- `addCustomGroups()`
-- `writeLaunchJson()`
-- `addTest()`
-- `isGenerated()`
-
-This allows you to customize the behavior of the script to fit your specific needs.
+The provided properties from a VS Code `launch.json` file are used to configure how the debugger launches and attaches
+to a process, specifically for Node.js debugging given the typical use of `port: 9229`.
 
 ## How it Works
 
