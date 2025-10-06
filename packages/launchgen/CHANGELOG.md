@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.8] - 2025-10-06
+
+- Fixed launchgen deno task install command.
+
 ## [0.7.7] - 2025-10-06
 
 - Moved project to @epdoc/tools repo
