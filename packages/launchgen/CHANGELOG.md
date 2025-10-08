@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.10] - 2025-10-07
+
+- Fixed unit tests.
+
 ## [0.7.9] - 2025-10-07
 
 - Fixed reported issue with LAUNCH not being found.
