@@ -1,7 +1,6 @@
-
-import { assertEquals } from '@std/assert';
-import { LaunchGenerator } from '../src/launchgen.ts';
 import { FolderSpec } from '@epdoc/fs';
+import { assertEquals } from '@std/assert';
+import { LaunchGenerator } from '../src/generator.ts';
 
 interface LaunchConfig {
   version: string;
@@ -31,7 +30,7 @@ Deno.test('LaunchGenerator', async () => {
     // Check results
     const launchJsonPath = new FolderSpec(vscodeDir, 'launch.json');
     const launchConfig: LaunchConfig = JSON.parse(await Deno.readTextFile(launchJsonPath.path));
-    
+
     assertEquals(launchConfig.configurations.length, 1);
     const config = launchConfig.configurations[0] as any;
     assertEquals(config.name, 'Debug src/my.test.ts');
@@ -42,7 +41,6 @@ Deno.test('LaunchGenerator', async () => {
     assertEquals(config.attachSimplePort, 9229);
     assertEquals(config.console, 'internalConsole');
     assertEquals(config.runtimeArgs.includes('--check'), true);
-
   } finally {
     Deno.chdir(originalCwd);
     await Deno.remove(tempDir, { recursive: true });

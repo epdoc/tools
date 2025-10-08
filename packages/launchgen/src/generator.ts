@@ -3,6 +3,8 @@ import { gray, green, red, white } from '@std/fmt/colors';
 import * as dfs from '@std/fs';
 import { globToRegExp } from '@std/path/glob-to-regexp';
 import path from 'node:path';
+import type { DenoJson, LaunchConfig, LaunchSpec, PackageJson, RuntimeType } from './types.ts';
+import { LAUNCH_CONFIG, LAUNCH_DEFAULT, VSCODE } from './consts.ts';
 
 /**
  * @fileoverview
@@ -11,63 +13,7 @@ import path from 'node:path';
  * files, and creates corresponding launch configurations.
  */
 
-// --- Constants ---------------------------------------------------------------
-
-const VSCODE = '.vscode';
-const LAUNCH_DEFAULT: LaunchSpec = { version: '0.2.0', configurations: [] };
-const LAUNCH_CONFIG = 'launch.config.json';
-
 // --- Type Declarations -------------------------------------------------------
-
-type RuntimeType = 'deno' | 'node';
-
-type ConfigGeneric = Record<string, number | string | string[] | Record<string, string>> & {
-  env?: { [key: string]: string };
-};
-
-type LaunchSpecConfig = ConfigGeneric & {
-  type: string;
-  request: 'launch';
-  name?: string;
-  cwd?: string;
-  runtimeExecutable?: string;
-  runtimeArgs?: string[];
-  attachSimplePort: number;
-  console?: string;
-};
-
-type LaunchSpec = {
-  version: string;
-  configurations: LaunchSpecConfig[];
-};
-
-type DenoJson = {
-  workspace?: string[];
-  tests?: {
-    include?: string[];
-    exclude?: string[];
-  };
-};
-
-type PackageJson = {
-  workspaces?: string[];
-};
-
-type LaunchConfig = {
-  port?: number;
-  console?: string;
-  tests?: {
-    runtimeArgs?: string[];
-  };
-  groups?: LaunchConfigGroup[];
-};
-
-type LaunchConfigGroup = {
-  program: string;
-  runtimeArgs: string[];
-  scriptArgs?: string;
-  scripts: (string | string[])[];
-};
 
 // --- Class -------------------------------------------------------------------
 
@@ -155,7 +101,7 @@ export class LaunchGenerator {
     const include = tests?.include || ['**/*'];
     const exclude = tests?.exclude || [];
     exclude.push('**/.*');
-    console.log({workspaces, include, exclude});
+    console.log({ workspaces, include, exclude });
     const includeRegex = include.map((pattern) => {
       return globToRegExp(path.resolve(this.#projectRoot, pattern), { globstar: true });
     });
@@ -304,38 +250,4 @@ export class LaunchGenerator {
 
 // --- Helper Functions --------------------------------------------------------
 
-async function findRoot(cwd: string, levels: number = 2): Promise<string | undefined> {
-  for (let i = 0; i < levels; i++) {
-    const checkPath = path.resolve(cwd, ...Array(i).fill('..'));
-    try {
-      const fileInfo = await Deno.lstat(path.join(checkPath, VSCODE));
-      if (fileInfo.isDirectory) {
-        return checkPath;
-      }
-    } catch (_err) {
-      // continue
-    }
-  }
-  return undefined;
-}
-
 // --- Main Execution ----------------------------------------------------------
-
-async function main() {
-  console.log(green('Executing launchgen.ts'));
-  const projectRoot = await findRoot(Deno.cwd());
-  if (!projectRoot) {
-    console.error(red('Project root folder not found'));
-    console.log(green('Your project folder must contain a'), VSCODE, green('folder.'));
-    console.log(white('Exit'));
-    Deno.exit(1);
-  }
-  console.log(green('Project root:'), projectRoot);
-
-  const generator = new LaunchGenerator(projectRoot);
-  await generator.run();
-}
-
-if (import.meta.main) {
-  main();
-}
