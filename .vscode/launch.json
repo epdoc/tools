@@ -2,6 +2,126 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "deno",
+      "request": "launch",
+      "name": "Debug bump/test/app.test.ts",
+      "program": "${workspaceFolder}/packages/bump/test/app.test.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--inspect-brk",
+        "-A",
+        "packages/bump/test/app.test.ts",
+        "--check"
+      ],
+      "attachSimplePort": 9229,
+      "console": "internalConsole",
+      "env": {
+        "LAUNCHGEN": "true"
+      }
+    },
+    {
+      "type": "deno",
+      "request": "launch",
+      "name": "Debug bump/test/git-md.test.ts",
+      "program": "${workspaceFolder}/packages/bump/test/git-md.test.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--inspect-brk",
+        "-A",
+        "packages/bump/test/git-md.test.ts",
+        "--check"
+      ],
+      "attachSimplePort": 9229,
+      "console": "internalConsole",
+      "env": {
+        "LAUNCHGEN": "true"
+      }
+    },
+    {
+      "type": "deno",
+      "request": "launch",
+      "name": "Debug bump/test/git.test.ts",
+      "program": "${workspaceFolder}/packages/bump/test/git.test.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--inspect-brk",
+        "-A",
+        "packages/bump/test/git.test.ts",
+        "--check"
+      ],
+      "attachSimplePort": 9229,
+      "console": "internalConsole",
+      "env": {
+        "LAUNCHGEN": "true"
+      }
+    },
+    {
+      "type": "deno",
+      "request": "launch",
+      "name": "Debug launchgen/test/launchgen.test.ts",
+      "program": "${workspaceFolder}/packages/launchgen/test/launchgen.test.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--inspect-brk",
+        "-A",
+        "packages/launchgen/test/launchgen.test.ts",
+        "--check"
+      ],
+      "attachSimplePort": 9229,
+      "console": "internalConsole",
+      "env": {
+        "LAUNCHGEN": "true"
+      }
+    },
+    {
+      "type": "deno",
+      "request": "launch",
+      "name": "Debug launchgen/test/utils.test.ts",
+      "program": "${workspaceFolder}/packages/launchgen/test/utils.test.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--inspect-brk",
+        "-A",
+        "packages/launchgen/test/utils.test.ts",
+        "--check"
+      ],
+      "attachSimplePort": 9229,
+      "console": "internalConsole",
+      "env": {
+        "LAUNCHGEN": "true"
+      }
+    },
+    {
+      "type": "deno",
+      "request": "launch",
+      "name": "Debug launchgen/test/workspaces.test.ts",
+      "program": "${workspaceFolder}/packages/launchgen/test/workspaces.test.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "--inspect-brk",
+        "-A",
+        "packages/launchgen/test/workspaces.test.ts",
+        "--check"
+      ],
+      "attachSimplePort": 9229,
+      "console": "internalConsole",
+      "env": {
+        "LAUNCHGEN": "true"
+      }
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Debug bump/main.ts ",
@@ -14,7 +134,7 @@
         "--allow-all"
       ],
       "attachSimplePort": 9229,
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "env": {
         "LAUNCHGEN": "true"
       },
@@ -35,7 +155,7 @@
         "--allow-all"
       ],
       "attachSimplePort": 9229,
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "env": {
         "LAUNCHGEN": "true"
       },
@@ -56,7 +176,7 @@
         "--allow-all"
       ],
       "attachSimplePort": 9229,
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "env": {
         "LAUNCHGEN": "true"
       },
@@ -77,7 +197,7 @@
         "--allow-all"
       ],
       "attachSimplePort": 9229,
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "env": {
         "LAUNCHGEN": "true"
       },
@@ -99,7 +219,7 @@
         "--allow-all"
       ],
       "attachSimplePort": 9229,
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "env": {
         "LAUNCHGEN": "true"
       },
@@ -121,7 +241,7 @@
         "--allow-all"
       ],
       "attachSimplePort": 9229,
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "env": {
         "LAUNCHGEN": "true"
       },
