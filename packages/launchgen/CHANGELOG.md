@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.11] - 2025-10-07
+
+- Fixed findRoot
+
 ## [0.7.10] - 2025-10-07
 
 - Converting to @epdoc/fs due to a miriad of fs problems.

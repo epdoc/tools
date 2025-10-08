@@ -1,13 +1,15 @@
+import { FolderSpec } from '@epdoc/fs';
 import path from 'node:path';
 import { VSCODE } from './consts.ts';
 
-export async function findRoot(cwd: string, levels: number = 2): Promise<string | undefined> {
+export async function findRoot(fsCwd: FolderSpec, levels: number = 2): Promise<FolderSpec | undefined> {
   for (let i = 0; i < levels; i++) {
-    const checkPath = path.resolve(cwd, ...Array(i).fill('..'));
+    const checkPath = path.resolve(fsCwd.path, ...Array(i).fill('..'));
+    const fullVscodePath = path.join(checkPath, VSCODE);
     try {
-      const fileInfo = await Deno.lstat(path.join(checkPath, VSCODE));
+      const fileInfo = await Deno.lstat(fullVscodePath);
       if (fileInfo.isDirectory) {
-        return checkPath;
+        return new FolderSpec(checkPath);
       }
     } catch (_err) {
       // continue

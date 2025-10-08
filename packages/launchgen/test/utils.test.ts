@@ -1,70 +1,72 @@
-import { assertEquals } from '@std/assert';
-import { join } from '@std/path';
-import { afterAll, beforeAll, beforeEach, afterEach, describe, it } from '@std/testing/bdd';
-import { findRoot } from '../src/utils.ts';
+import { FolderSpec } from '@epdoc/fs';
+import { assert, assertEquals } from '@std/assert';
+import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { VSCODE } from '../src/consts.ts';
+import { findRoot } from '../src/utils.ts';
 
 describe('findRoot', () => {
-  let tempDir: string;
+  let fsTempFolder: FolderSpec;
   const originalCwd: string = Deno.cwd();
 
   beforeEach(async () => {
-    tempDir = await Deno.makeTempDir();
-    Deno.chdir(tempDir);
+    fsTempFolder = await FolderSpec.makeTemp();
+    Deno.chdir(fsTempFolder.path);
   });
 
   afterEach(async () => {
     Deno.chdir(originalCwd);
-    if (tempDir) {
-      await Deno.remove(tempDir, { recursive: true });
+    if (fsTempFolder) {
+      await fsTempFolder.remove({ recursive: true });
     }
   });
 
   it('should find the root at the current working directory', async () => {
-    const vscodePath = join(tempDir, VSCODE);
-    await Deno.mkdir(vscodePath, { recursive: true });
-    const root = await findRoot(tempDir);
-    assertEquals(root, tempDir);
+    const fsVscodeFolder = new FolderSpec(fsTempFolder, VSCODE);
+    await fsVscodeFolder.ensureDir();
+    const root = await findRoot(fsTempFolder);
+    assert(root);
+    assertEquals(root.path, fsTempFolder.path);
   });
 
   it('should find the root in a parent directory', async () => {
-    const parentDir = join(tempDir, 'parent');
-    const childDir = join(parentDir, 'child');
-    const vscodePath = join(parentDir, VSCODE);
-
-    await Deno.mkdir(childDir, { recursive: true });
-    await Deno.mkdir(vscodePath, { recursive: true });
-
+    const parentDir = new FolderSpec(fsTempFolder, 'parent');
+    const childDir = new FolderSpec(parentDir, 'child');
+    const vscodePath = new FolderSpec(parentDir, VSCODE);
+    await parentDir.ensureDir(); // Ensure parentDir exists
+    await childDir.ensureDir();
+    await vscodePath.ensureDir();
     const root = await findRoot(childDir, 2);
-    assertEquals(root, parentDir);
+    assert(root);
+    assertEquals(root.path, parentDir.path);
   });
 
   it('should return undefined if .vscode is not found', async () => {
-    const root = await findRoot(tempDir);
+    const root = await findRoot(fsTempFolder);
     assertEquals(root, undefined);
   });
 
   it('should return undefined if .vscode is beyond the specified levels', async () => {
-    const parentDir = join(tempDir, 'parent');
-    const grandParentDir = join(tempDir, 'grandparent');
-    const vscodePath = join(grandParentDir, VSCODE);
+    const parentDir = new FolderSpec(fsTempFolder, 'parent');
+    const grandParentDir = new FolderSpec(fsTempFolder, 'grandparent');
+    const vscodePath = new FolderSpec(grandParentDir, VSCODE);
 
-    await Deno.mkdir(parentDir, { recursive: true });
-    await Deno.mkdir(vscodePath, { recursive: true });
+    await parentDir.ensureDir();
+    await vscodePath.ensureDir();
 
     const root = await findRoot(parentDir, 1); // Only search 1 level up
     assertEquals(root, undefined);
   });
 
   it('should find the root when .vscode is in a grandparent directory', async () => {
-    const parentDir = join(tempDir, 'parent');
-    const childDir = join(parentDir, 'child');
-    const vscodePath = join(tempDir, VSCODE); // .vscode in tempDir (grandparent to childDir)
+    const parentDir = new FolderSpec(fsTempFolder, 'parent');
+    const childDir = new FolderSpec(parentDir, 'child');
+    const vscodePath = new FolderSpec(fsTempFolder, VSCODE); // .vscode in tempDir (grandparent to childDir)
 
-    await Deno.mkdir(childDir, { recursive: true });
-    await Deno.mkdir(vscodePath, { recursive: true });
+    await childDir.ensureDir();
+    await vscodePath.ensureDir();
 
     const root = await findRoot(childDir, 3); // Search 3 levels up
-    assertEquals(root, tempDir);
+    assert(root);
+    assertEquals(root.path, fsTempFolder.path);
   });
 });
