@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.9] - 2025-10-07
+
+- Fixed reported issue with LAUNCH not being found.
+- Removed dependency on @epdoc/fs.
+
 ## [0.7.8] - 2025-10-06
 
 - Fixed launchgen deno task install command.

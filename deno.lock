@@ -4,8 +4,8 @@
     "jsr:@epdoc/cliapp@^1.0.0-alpha.9": "1.0.0-alpha.9",
     "jsr:@epdoc/datetime@^2.0.0-beta.4": "2.0.0-beta.4",
     "jsr:@epdoc/duration@~0.2.3": "0.2.3",
-    "jsr:@epdoc/fs@~0.2.17": "0.2.23",
-    "jsr:@epdoc/fs@~0.2.23": "0.2.23",
+    "jsr:@epdoc/fs@~0.2.23": "0.2.24",
+    "jsr:@epdoc/fs@~0.2.24": "0.2.24",
     "jsr:@epdoc/logger@^1003.0.0-alpha.12": "1003.0.0-alpha.12",
     "jsr:@epdoc/loglevels@^0.0.1-alpha.10": "0.0.1-alpha.10",
     "jsr:@epdoc/msgbuilder@^0.0.1-alpha.9": "0.0.1-alpha.9",
@@ -59,8 +59,8 @@
         "jsr:@epdoc/type"
       ]
     },
-    "@epdoc/fs@0.2.23": {
-      "integrity": "7279bb86fb087ca03a575c360ad15d179f2561f0a0605687320bf3b1551b4c50",
+    "@epdoc/fs@0.2.24": {
+      "integrity": "678e2cf6973f3d8ab15f87e4a0f8240c9410631c478df770f70d6c7ae773086c",
       "dependencies": [
         "jsr:@epdoc/string@~0.1.3",
         "jsr:@epdoc/type",
@@ -251,7 +251,7 @@
       },
       "packages/launchgen": {
         "dependencies": [
-          "jsr:@epdoc/fs@~0.2.17",
+          "jsr:@epdoc/fs@~0.2.24",
           "jsr:@std/assert@^1.0.14",
           "jsr:@std/fmt@^1.0.8",
           "jsr:@std/fs@^1.0.19",

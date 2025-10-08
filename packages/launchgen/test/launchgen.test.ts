@@ -1,39 +1,50 @@
-
 import { assertEquals } from '@std/assert';
-import { LaunchGenerator } from '../src/launchgen.ts';
-import { FolderSpec } from '@epdoc/fs';
+import { join } from '@std/path';
+import { afterAll, beforeAll, describe, it } from '@std/testing/bdd';
+import { LaunchGenerator } from '../src/mod.ts';
 
 interface LaunchConfig {
   version: string;
   configurations: unknown[];
 }
 
-Deno.test('LaunchGenerator', async () => {
-  const tempDir = await Deno.makeTempDir();
-  const originalCwd = Deno.cwd();
-  Deno.chdir(tempDir);
+describe('LaunchGenerator', () => {
+  let tempDir: string;
+  const originalCwd: string = Deno.cwd();
 
-  try {
+  beforeAll(async () => {
+    tempDir = await Deno.makeTempDir();
+    Deno.chdir(tempDir);
+  });
+
+  afterAll(async () => {
+    Deno.chdir(originalCwd);
+    if (tempDir) {
+      await Deno.remove(tempDir, { recursive: true });
+    }
+  });
+
+  it('should generate launch config for a test file', async () => {
     // Setup mock project
-    const vscodeDir = new FolderSpec(tempDir, '.vscode');
-    await vscodeDir.ensureDir();
-    const denoJson = new FolderSpec(tempDir, 'deno.json');
-    await Deno.writeTextFile(denoJson.path, '{"tests": {"include": ["src/**/*"]}}');
-    const srcDir = new FolderSpec(tempDir, 'src');
-    await srcDir.ensureDir();
-    const testFile = new FolderSpec(srcDir, 'my.test.ts');
-    await Deno.writeTextFile(testFile.path, '// test file');
+    const vscodeDir = join(tempDir, '.vscode');
+    await Deno.mkdir(vscodeDir, { recursive: true });
+    const denoJsonPath = join(tempDir, 'deno.json');
+    await Deno.writeTextFile(denoJsonPath, '{"tests": {"include": ["src/**/*"]}}');
+    const srcDir = join(tempDir, 'src');
+    await Deno.mkdir(srcDir, { recursive: true });
+    const testFile = join(srcDir, 'my.test.ts');
+    await Deno.writeTextFile(testFile, '// test file');
 
     // Run generator
     const generator = new LaunchGenerator(tempDir);
     await generator.run();
 
     // Check results
-    const launchJsonPath = new FolderSpec(vscodeDir, 'launch.json');
-    const launchConfig: LaunchConfig = JSON.parse(await Deno.readTextFile(launchJsonPath.path));
-    
+    const launchJsonPath = join(vscodeDir, 'launch.json');
+    const launchConfig: LaunchConfig = JSON.parse(await Deno.readTextFile(launchJsonPath));
+
     assertEquals(launchConfig.configurations.length, 1);
-    const config = launchConfig.configurations[0] as any;
+    const config = launchConfig.configurations[0] as unknown;
     assertEquals(config.name, 'Debug src/my.test.ts');
     assertEquals(config.type, 'deno');
     assertEquals(config.request, 'launch');
@@ -42,9 +53,5 @@ Deno.test('LaunchGenerator', async () => {
     assertEquals(config.attachSimplePort, 9229);
     assertEquals(config.console, 'internalConsole');
     assertEquals(config.runtimeArgs.includes('--check'), true);
-
-  } finally {
-    Deno.chdir(originalCwd);
-    await Deno.remove(tempDir, { recursive: true });
-  }
+  });
 });
