@@ -1,5 +1,5 @@
 #!/usr/bin/env -S deno run -RWES
-import { FolderSpec } from '@epdoc/fs';
+import type { FolderSpec } from '@epdoc/fs';
 import { gray, green, white } from '@std/fmt/colors';
 import * as dfs from '@std/fs';
 import { globToRegExp } from '@std/path/glob-to-regexp';
@@ -107,7 +107,7 @@ export class LaunchGenerator {
   }
 
   protected async addWorkspaceFiles(): Promise<void> {
-    const additions: dfs.WalkEntry[] = [];
+    const additions: (dfs.WalkEntry & { displayPath: string; programPath: string })[] = [];
     const tests = (this.#projectConfig as DenoJson).tests;
     let workspaces = (this.#projectConfig as DenoJson).workspace ||
       (this.#projectConfig as PackageJson).workspaces || ['./'];
@@ -162,12 +162,14 @@ export class LaunchGenerator {
           ) {
             console.log('entry', entry.path);
             if (entry.isFile && /\.(test|run)\.(ts|js)$/.test(entry.name)) {
-              let relativePath = path.relative(this.#projectRoot, entry.path);
-              if (workspaceRoot && relativePath.startsWith(workspaceRoot)) {
-                relativePath = relativePath.substring(workspaceRoot.length);
+              const fullRelativePath = path.relative(this.#projectRoot, entry.path);
+
+              let displayPath = fullRelativePath;
+              if (workspaceRoot && fullRelativePath.startsWith(workspaceRoot)) {
+                displayPath = fullRelativePath.substring(workspaceRoot.length);
               }
-              entry.name = relativePath;
-              additions.push(entry);
+
+              additions.push({ ...entry, displayPath, programPath: fullRelativePath });
             }
           }
         }),
@@ -226,11 +228,11 @@ export class LaunchGenerator {
     console.log(green('Updated'), launchFile);
   }
 
-  protected addTest(entry: dfs.WalkEntry): void {
+  protected addTest(entry: dfs.WalkEntry & { displayPath: string; programPath: string }): void {
     if (entry.isFile) {
-      console.log(green('  Adding'), entry.name, gray(entry.path));
+      console.log(green('  Adding'), entry.displayPath, gray(entry.path));
       const defaultArgs = this.#runtime === 'deno' ? ['test', '--inspect-brk', '-A'] : [];
-      const runtimeArgs = [...defaultArgs, entry.path];
+      const runtimeArgs = [...defaultArgs, entry.programPath];
       const testRuntimeArgs = this.#launchConfig.tests?.runtimeArgs || ['--check'];
       if (testRuntimeArgs) {
         testRuntimeArgs.forEach((arg) => {
@@ -243,8 +245,8 @@ export class LaunchGenerator {
       const item: LaunchSpecConfig = {
         type: this.#runtime,
         request: 'launch',
-        name: `Debug ${entry.name}`,
-        program: '${workspaceFolder}/' + entry.name,
+        name: `Debug ${entry.displayPath}`,
+        program: '${workspaceFolder}/' + entry.programPath,
         cwd: '${workspaceFolder}',
         runtimeExecutable: this.#runtime,
         runtimeArgs,

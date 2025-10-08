@@ -1,3 +1,4 @@
+import { FolderSpec } from '@epdoc/fs';
 import { green, red, white } from '@std/fmt/colors';
 import * as Launch from './src/mod.ts';
 
@@ -21,7 +22,7 @@ Options:
     Deno.exit(0);
   }
 
-  const projectRoot = await Launch.findRoot(Deno.cwd());
+  const projectRoot = await Launch.findRoot(new FolderSpec(Deno.cwd()));
   if (!projectRoot) {
     console.error(red('Project root folder not found'));
     console.log(green('Your project folder must contain a'), Launch.VSCODE, green('folder.'));

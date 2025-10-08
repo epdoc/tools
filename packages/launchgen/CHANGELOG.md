@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.12] - 2025-10-07
+
+- Broke project into multiple files.
+- Added unit tests for findRoot and workspaces.
+
 ## [0.7.11] - 2025-10-07
 
 - Fixed findRoot
