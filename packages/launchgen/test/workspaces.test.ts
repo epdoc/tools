@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert';
 import { join } from '@std/path';
 import { afterAll, beforeAll, describe, it } from '@std/testing/bdd';
-import { LaunchGenerator } from '../src/mod.ts';
+import { LaunchGenerator, type LaunchSpecConfig } from '../src/mod.ts';
 
 interface LaunchConfig {
   version: string;
@@ -31,9 +31,12 @@ describe('LaunchGenerator with Workspaces', () => {
 
     // Root deno.json
     const rootDenoJsonPath = join(tempDir, 'deno.json');
-    await Deno.writeTextFile(rootDenoJsonPath, JSON.stringify({
-      workspace: ['packages/*'],
-    }));
+    await Deno.writeTextFile(
+      rootDenoJsonPath,
+      JSON.stringify({
+        workspace: ['packages/*'],
+      }),
+    );
 
     // Package 1
     const pkg1Dir = join(tempDir, 'packages', 'pkg1');
@@ -56,9 +59,9 @@ describe('LaunchGenerator with Workspaces', () => {
     await Deno.writeTextFile(test2File, '// test file 2');
 
     // Run generator
-    console.log('DEBUG: Contents of tempDir', Array.from(Deno.readDirSync(tempDir)).map(e => e.name));
-    console.log('DEBUG: Contents of pkg1Dir', Array.from(Deno.readDirSync(pkg1Dir)).map(e => e.name));
-    console.log('DEBUG: Contents of pkg2Dir', Array.from(Deno.readDirSync(pkg2Dir)).map(e => e.name));
+    console.log('DEBUG: Contents of tempDir', Array.from(Deno.readDirSync(tempDir)).map((e) => e.name));
+    console.log('DEBUG: Contents of pkg1Dir', Array.from(Deno.readDirSync(pkg1Dir)).map((e) => e.name));
+    console.log('DEBUG: Contents of pkg2Dir', Array.from(Deno.readDirSync(pkg2Dir)).map((e) => e.name));
     const generator = new LaunchGenerator(tempDir);
     await generator.run();
 
@@ -68,13 +71,13 @@ describe('LaunchGenerator with Workspaces', () => {
 
     assertEquals(launchConfig.configurations.length, 2);
 
-    const names = (launchConfig.configurations as any[]).map(c => c.name).sort();
+    const names = (launchConfig.configurations as LaunchSpecConfig[]).map((c) => c.name).sort();
     assertEquals(names, [
       'Debug packages/pkg1/src/test1.test.ts',
       'Debug packages/pkg2/src/test2.test.ts',
     ]);
 
-    const programs = (launchConfig.configurations as any[]).map(c => c.program).sort();
+    const programs = (launchConfig.configurations as LaunchSpecConfig[]).map((c) => c.program).sort();
     assertEquals(programs, [
       '${workspaceFolder}/packages/pkg1/src/test1.test.ts',
       '${workspaceFolder}/packages/pkg2/src/test2.test.ts',

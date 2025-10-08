@@ -1,10 +1,19 @@
 #!/usr/bin/env -S deno run -RWES
-import { gray, green, red, white } from '@std/fmt/colors';
+import { FolderSpec } from '@epdoc/fs';
+import { gray, green, white } from '@std/fmt/colors';
 import * as dfs from '@std/fs';
 import { globToRegExp } from '@std/path/glob-to-regexp';
 import path from 'node:path';
-import type { DenoJson, LaunchConfig, LaunchSpec, PackageJson, RuntimeType } from './types.ts';
 import { LAUNCH_CONFIG, LAUNCH_DEFAULT, VSCODE } from './consts.ts';
+import type {
+  DenoJson,
+  LaunchConfig,
+  LaunchConfigGroup,
+  LaunchSpec,
+  LaunchSpecConfig,
+  PackageJson,
+  RuntimeType,
+} from './types.ts';
 
 /**
  * @fileoverview
@@ -21,14 +30,18 @@ import { LAUNCH_CONFIG, LAUNCH_DEFAULT, VSCODE } from './consts.ts';
  * Generates `launch.json` configurations for Deno or Node.js projects.
  */
 export class LaunchGenerator {
-  #projectRoot: string;
+  #fsRoot: FolderSpec;
   #runtime: RuntimeType = 'deno';
   #launchSpec: LaunchSpec = LAUNCH_DEFAULT;
   #launchConfig: LaunchConfig = {};
   #projectConfig: DenoJson | PackageJson = {};
 
-  constructor(projectRoot: string) {
-    this.#projectRoot = projectRoot;
+  constructor(fsRoot: FolderSpec) {
+    this.#fsRoot = fsRoot;
+  }
+
+  get #projectRoot() {
+    return this.#fsRoot.path;
   }
 
   async run(): Promise<void> {

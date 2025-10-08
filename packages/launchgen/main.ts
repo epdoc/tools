@@ -2,7 +2,25 @@ import { green, red, white } from '@std/fmt/colors';
 import * as Launch from './src/mod.ts';
 
 async function main() {
-  console.log(green('Executing launchgen.ts'));
+  const args = Deno.args;
+
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log(`
+Usage: launchgen [options]
+
+Options:
+  -h, --help     Show help information
+  -v, --version  Show version number
+`);
+    Deno.exit(0);
+  }
+
+  if (args.includes('--version') || args.includes('-v')) {
+    // TODO: Get version from a more appropriate source, e.g., deno.json
+    console.log('launchgen 1.0.0');
+    Deno.exit(0);
+  }
+
   const projectRoot = await Launch.findRoot(Deno.cwd());
   if (!projectRoot) {
     console.error(red('Project root folder not found'));

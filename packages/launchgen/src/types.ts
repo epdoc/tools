@@ -13,6 +13,7 @@ export type LaunchSpecConfig = ConfigGeneric & {
   runtimeArgs?: string[];
   attachSimplePort: number;
   console?: string;
+  env?: { [key: string]: string };
 };
 
 export type LaunchSpec = {
