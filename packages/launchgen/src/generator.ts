@@ -160,7 +160,6 @@ export class LaunchGenerator {
               skip: excludeRegex,
             })
           ) {
-            console.log('entry', entry.path);
             if (entry.isFile && /\.(test|run)\.(ts|js)$/.test(entry.name)) {
               const fullRelativePath = path.relative(this.#projectRoot, entry.path);
 

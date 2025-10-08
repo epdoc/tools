@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.15] - 2025-10-07
+
+- Added features list that we need to work on.
+
 ## [0.7.14] - 2025-10-07
 
 - Fixed console output of root folder
