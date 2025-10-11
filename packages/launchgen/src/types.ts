@@ -1,50 +1,53 @@
-export type RuntimeType = 'deno' | 'node';
-
-export type ConfigGeneric = Record<string, number | string | string[] | Record<string, string>> & {
-  env?: { [key: string]: string };
-};
-
-export type LaunchSpecConfig = ConfigGeneric & {
+export type LaunchConfiguration = {
   type: string;
   request: 'launch';
-  name?: string;
+  name: string;
+  program?: string;
   cwd?: string;
   runtimeExecutable?: string;
   runtimeArgs?: string[];
-  attachSimplePort: number;
+  args?: string[];
+  attachSimplePort?: number;
   console?: string;
+  presentation?: {
+    group?: string;
+  };
   env?: { [key: string]: string };
 };
 
-export type LaunchSpec = {
+export type LaunchJson = {
   version: string;
-  configurations: LaunchSpecConfig[];
+  configurations: LaunchConfiguration[];
+  compounds?: unknown[];
 };
 
-export type DenoJson = {
-  workspace?: string[];
-  tests?: {
-    include?: string[];
-    exclude?: string[];
-  };
-};
-
-export type PackageJson = {
-  workspaces?: string[];
+export type Group = {
+  id: string;
+  name: string;
+  includes?: string[];
+  excludes?: string[];
+  program?: string;
+  runtimeArgs?: string[];
+  scriptArgs?: string | string[];
+  scripts?: (string | string[])[];
+  port?: number;
+  console?: string;
 };
 
 export type LaunchConfig = {
   port?: number;
   console?: string;
-  tests?: {
-    runtimeArgs?: string[];
-  };
-  groups?: LaunchConfigGroup[];
+  excludes?: string[];
+  groups?: Group[];
 };
 
-export type LaunchConfigGroup = {
-  program: string;
-  runtimeArgs: string[];
-  scriptArgs?: string;
-  scripts: (string | string[])[];
+export type DenoJson = {
+  workspaces?: string[];
+  workspace?: string[];
+  exports?: Record<string, string>;
+  launch?: LaunchConfig;
+};
+
+export type PackageJson = {
+  workspaces?: string[];
 };

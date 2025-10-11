@@ -1,267 +1,242 @@
-#!/usr/bin/env -S deno run -RWES
-import type { FolderSpec } from '@epdoc/fs';
-import { gray, green, white } from '@std/fmt/colors';
-import * as dfs from '@std/fs';
+import { FileSpec, FolderSpec } from '@epdoc/fs';
+import { green, white } from '@std/fmt/colors';
 import { globToRegExp } from '@std/path/glob-to-regexp';
-import path from 'node:path';
-import { LAUNCH_CONFIG, LAUNCH_DEFAULT, VSCODE } from './consts.ts';
-import type {
-  DenoJson,
-  LaunchConfig,
-  LaunchConfigGroup,
-  LaunchSpec,
-  LaunchSpecConfig,
-  PackageJson,
-  RuntimeType,
-} from './types.ts';
+import { ConfigLoader } from './config-loader.ts';
+import { FileFinder } from './file-finder.ts';
+import type { DenoJson, Group, LaunchConfig, LaunchConfiguration, LaunchJson } from './types.ts';
 
-/**
- * @fileoverview
- * This script automatically generates or updates the `.vscode/launch.json` file with debugging
- * configurations for Deno or Node.js projects. It detects the project type, finds test and run
- * files, and creates corresponding launch configurations.
- */
-
-// --- Type Declarations -------------------------------------------------------
-
-// --- Class -------------------------------------------------------------------
-
-/**
- * Generates `launch.json` configurations for Deno or Node.js projects.
- */
 export class LaunchGenerator {
-  #fsRoot: FolderSpec;
-  #runtime: RuntimeType = 'deno';
-  #launchSpec: LaunchSpec = LAUNCH_DEFAULT;
-  #launchConfig: LaunchConfig = {};
-  #projectConfig: DenoJson | PackageJson = {};
+  #projectRoot: FolderSpec;
+  #dryRun: boolean;
+  #init: boolean;
 
-  constructor(fsRoot: FolderSpec) {
-    this.#fsRoot = fsRoot;
-  }
-
-  get #projectRoot() {
-    return this.#fsRoot.path;
+  constructor(projectRoot: FolderSpec, dryRun = false, init = false) {
+    this.#projectRoot = projectRoot;
+    this.#dryRun = dryRun;
+    this.#init = init;
   }
 
   async run(): Promise<void> {
-    await this.detectRuntime();
-    await this.loadConfigs();
-    this.filterExisting();
-    await this.addWorkspaceFiles();
-    this.addCustomGroups();
-    this.writeLaunchJson();
-  }
+    const existingLaunch = await this.#loadExistingLaunch();
+    const workspaces = await this.findWorkspaces();
+    const configurations: LaunchConfiguration[] = [];
 
-  protected async detectRuntime(): Promise<void> {
-    try {
-      await Deno.stat(path.join(this.#projectRoot, 'deno.json'));
-      this.#runtime = 'deno';
-    } catch (_err) {
-      try {
-        await Deno.stat(path.join(this.#projectRoot, 'package.json'));
-        this.#runtime = 'node';
-      } catch (_err) {
-        // Default to deno
-      }
+    // Preserve manual configurations
+    const manualConfigs = existingLaunch.configurations.filter((config) => !this.#isGenerated(config));
+    configurations.push(...manualConfigs);
+
+    console.log(green('Retaining'), white(String(manualConfigs.length)), green('manual configurations'));
+
+    // Process workspaces first
+    for (const workspace of workspaces) {
+      const rootConfig = await this.processWorkspace(this.#projectRoot, {});
+      const workspaceConfig = await this.processWorkspace(workspace, rootConfig);
+      const workspaceName = workspace.path.substring(this.#projectRoot.path.length + 1).split('/').pop() || 'unknown';
+      const workspaceConfigs = await this.generateConfigurations(workspace, workspaceConfig, workspaceName);
+      configurations.push(...workspaceConfigs);
+    }
+
+    // Only process root if no workspaces, or for files outside workspace directories
+    if (workspaces.length === 0) {
+      const rootConfig = await this.processWorkspace(this.#projectRoot, {});
+      const rootConfigs = await this.generateConfigurations(this.#projectRoot, rootConfig, 'root');
+      configurations.push(...rootConfigs);
+    }
+
+    await this.#writeLaunchJson({ ...existingLaunch, configurations });
+    if (!this.#dryRun) {
+      console.log(green('Updated'), this.#projectRoot.path + '/.vscode/launch.json');
     }
   }
 
-  protected async loadConfigs(): Promise<void> {
-    const launchFile = path.resolve(this.#projectRoot, VSCODE, 'launch.json');
-    const configFile = path.resolve(this.#projectRoot, LAUNCH_CONFIG);
-    const projFile = path.resolve(
-      this.#projectRoot,
-      this.#runtime === 'deno' ? 'deno.json' : 'package.json',
-    );
-
-    try {
-      this.#launchSpec = JSON.parse(await Deno.readTextFile(launchFile));
-    } catch (_err) {
-      /* use default */
+  async #loadExistingLaunch(): Promise<LaunchJson> {
+    const launchFile = new FileSpec(this.#projectRoot, '.vscode', 'launch.json');
+    if (await launchFile.getIsFile()) {
+      return await launchFile.readJson<LaunchJson>();
     }
-    try {
-      this.#launchConfig = JSON.parse(await Deno.readTextFile(configFile));
-    } catch (_err) {
-      /* use default */
-    }
-    try {
-      this.#projectConfig = JSON.parse(await Deno.readTextFile(projFile));
-    } catch (_err) {
-      /* use default */
-    }
+    return { version: '0.2.0', configurations: [] };
   }
 
-  protected filterExisting(): void {
-    this.#launchSpec.configurations = this.#launchSpec.configurations.filter(
-      (config) => !this.isGenerated(config),
-    );
-    console.log(
-      green('Retaining'),
-      white(String(this.#launchSpec.configurations.length)),
-      green('configurations from existing launch.json'),
-    );
-    this.#launchSpec.configurations.forEach((config) => {
-      console.log(green('  Retaining'), config.name);
-    });
-  }
+  protected async findWorkspaces(): Promise<FolderSpec[]> {
+    const denoJsonFile = new FileSpec(this.#projectRoot, 'deno.json');
+    const packageJsonFile = new FileSpec(this.#projectRoot, 'package.json');
 
-  protected async addWorkspaceFiles(): Promise<void> {
-    const additions: (dfs.WalkEntry & { displayPath: string; programPath: string })[] = [];
-    const tests = (this.#projectConfig as DenoJson).tests;
-    let workspaces = (this.#projectConfig as DenoJson).workspace ||
-      (this.#projectConfig as PackageJson).workspaces || ['./'];
-    const include = tests?.include || ['**/*'];
-    const exclude = tests?.exclude || [];
-    exclude.push('**/.*');
-    console.log({ workspaces, include, exclude });
-    const includeRegex = include.map((pattern) => {
-      return globToRegExp(path.resolve(this.#projectRoot, pattern), { globstar: true });
-    });
-    const excludeRegex = exclude.map((pattern) => {
-      return globToRegExp(path.resolve(this.#projectRoot, pattern), { globstar: true });
+    let workspacePatterns: string[] = [];
+
+    if (await denoJsonFile.getIsFile()) {
+      const denoJson = await denoJsonFile.readJson<DenoJson>();
+      workspacePatterns = denoJson.workspaces || denoJson.workspace || [];
+    } else if (await packageJsonFile.getIsFile()) {
+      const packageJson = await packageJsonFile.readJson<{ workspaces?: string[] }>();
+      workspacePatterns = packageJson.workspaces || [];
+    }
+
+    if (workspacePatterns.length === 0) {
+      return [];
+    }
+
+    const workspaces: FolderSpec[] = [];
+    // Normalize patterns by removing leading ./
+    const normalizedPatterns = workspacePatterns.map((p) => p.startsWith('./') ? p.slice(2) : p);
+    const workspaceRegexes = normalizedPatterns.map((pattern) => globToRegExp(pattern, { globstar: true }));
+
+    const walkedDirs = await this.#projectRoot.walk({
+      includeFiles: false,
+      includeDirs: true,
+      followSymlinks: false,
     });
 
-    let workspaceRoot: string | undefined;
-    if (workspaces.length === 1 && workspaces[0].endsWith('/*')) {
-      workspaceRoot = path.dirname(workspaces[0]);
-      if (workspaceRoot === '.') {
-        workspaceRoot = undefined;
-      } else {
-        workspaceRoot = workspaceRoot.replace(/^\.\//, '') + '/';
-      }
-    }
+    for (const spec of walkedDirs) {
+      if (spec instanceof FolderSpec && spec.path !== this.#projectRoot.path) {
+        const relativePath = spec.path.substring(this.#projectRoot.path.length + 1);
 
-    if (Array.isArray(workspaces)) {
-      const expandedWorkspaces: string[] = [];
-      for (const scope of workspaces) {
-        if (scope.includes('*')) {
-          for await (const entry of dfs.expandGlob(scope, { root: this.#projectRoot })) {
-            if (entry.isDirectory) {
-              try {
-                await Deno.stat(path.join(entry.path, 'deno.json'));
-                expandedWorkspaces.push(entry.path);
-              } catch (_err) {
-                // Not a workspace, ignore.
-              }
+        for (const regex of workspaceRegexes) {
+          if (regex.test(relativePath)) {
+            const denoJsonInWorkspace = new FileSpec(spec, 'deno.json');
+            if (await denoJsonInWorkspace.getIsFile()) {
+              workspaces.push(spec);
+              break;
             }
           }
+        }
+      }
+    }
+
+    return workspaces;
+  }
+
+  protected async processWorkspace(workspace: FolderSpec, parentConfig: LaunchConfig): Promise<LaunchConfig> {
+    const configLoader = new ConfigLoader();
+    const workspaceConfig = await configLoader.loadAndMerge(workspace, this.#init);
+    return this.#mergeConfigs(parentConfig, workspaceConfig);
+  }
+
+  #mergeConfigs(parent: LaunchConfig, workspace: LaunchConfig): LaunchConfig {
+    const merged: LaunchConfig = { ...parent };
+
+    if (workspace.port !== undefined) merged.port = workspace.port;
+    if (workspace.console !== undefined) merged.console = workspace.console;
+    if (workspace.excludes !== undefined) merged.excludes = workspace.excludes;
+
+    if (workspace.groups) {
+      const parentGroups = parent.groups || [];
+      const mergedGroups: Group[] = [...parentGroups];
+
+      for (const workspaceGroup of workspace.groups) {
+        const existingIndex = mergedGroups.findIndex((g) => g.id === workspaceGroup.id);
+        if (existingIndex >= 0) {
+          mergedGroups[existingIndex] = { ...mergedGroups[existingIndex], ...workspaceGroup };
         } else {
-          expandedWorkspaces.push(path.resolve(this.#projectRoot, scope));
+          mergedGroups.push(workspaceGroup);
         }
       }
-      workspaces = expandedWorkspaces;
-
-      await Promise.all(
-        workspaces.map(async (workspacePath: string) => {
-          for await (
-            const entry of dfs.walk(workspacePath, {
-              match: includeRegex,
-              skip: excludeRegex,
-            })
-          ) {
-            if (entry.isFile && /\.(test|run)\.(ts|js)$/.test(entry.name)) {
-              const fullRelativePath = path.relative(this.#projectRoot, entry.path);
-
-              let displayPath = fullRelativePath;
-              if (workspaceRoot && fullRelativePath.startsWith(workspaceRoot)) {
-                displayPath = fullRelativePath.substring(workspaceRoot.length);
-              }
-
-              additions.push({ ...entry, displayPath, programPath: fullRelativePath });
-            }
-          }
-        }),
-      );
+      merged.groups = mergedGroups;
     }
 
-    console.log(green('Adding'), white(String(additions.length)), green('test files'));
-    additions.sort((a, b) => a.path.localeCompare(b.path));
-    additions.forEach((entry) => {
-      this.addTest(entry);
-    });
+    return merged;
   }
 
-  protected addCustomGroups(): void {
-    const configAdditions: LaunchSpecConfig[] = [];
-    if (Array.isArray(this.#launchConfig.groups)) {
-      this.#launchConfig.groups.forEach((group: LaunchConfigGroup) => {
-        if (!group.scripts || group.scripts.length === 0) {
-          group.scripts = [''];
-        }
-        group.scripts.forEach((script: string | string[]) => {
-          const name = Array.isArray(script) ? script.join(' ') : script;
-          const entry: LaunchSpecConfig = {
+  protected async generateConfigurations(
+    workspace: FolderSpec,
+    config: LaunchConfig,
+    workspaceName: string,
+  ): Promise<LaunchConfiguration[]> {
+    const configurations: LaunchConfiguration[] = [];
+
+    if (!config.groups) return configurations;
+
+    for (const group of config.groups) {
+      if (group.includes) {
+        const fileFinder = new FileFinder();
+        const allExcludes = [...(config.excludes || []), ...(group.excludes || [])];
+        const files = await fileFinder.findFiles(workspace, group.includes, allExcludes);
+
+        for (const file of files) {
+          const relativePath = file.path.substring(workspace.path.length + 1);
+          const displayName = workspaceName === 'root' ? relativePath : `${workspaceName}: ${relativePath}`;
+
+          console.log(green('  Adding'), displayName);
+
+          configurations.push({
             type: 'node',
             request: 'launch',
-            name: `Debug ${group.program} ${name}`,
-            program: '${workspaceFolder}/' + group.program,
+            name: displayName,
+            program: '${workspaceFolder}/' +
+              (workspaceName === 'root' ? relativePath : `${workspaceName}/${relativePath}`),
             cwd: '${workspaceFolder}',
-            runtimeExecutable: this.#runtime,
-            runtimeArgs: group.runtimeArgs,
-            attachSimplePort: this.#launchConfig.port || 9229,
-            console: this.#launchConfig.console || 'internalConsole',
+            runtimeExecutable: 'deno',
+            runtimeArgs: group.runtimeArgs || [],
+            attachSimplePort: group.port || config.port || 9229,
+            console: group.console || config.console || 'internalConsole',
+            presentation: workspaceName === 'root' ? undefined : {
+              group: workspaceName,
+            },
             env: { LAUNCHGEN: 'true' },
-          };
-          const argLog = Array.isArray(group.scriptArgs) ? group.scriptArgs : [];
-          if (Array.isArray(script)) {
-            entry.args = [...argLog, ...script];
-          } else {
-            entry.args = [...argLog, ...script.split(/\s+/)];
+          });
+        }
+      } else if (group.program) {
+        const scripts = group.scripts || [''];
+        console.log(green('  Adding'), white(String(scripts.length)), green('entries for'), group.name);
+
+        for (const script of scripts) {
+          const scriptArgs = Array.isArray(script) ? script : (script ? script.split(/\s+/) : []);
+          const scriptName = scriptArgs.length > 0 ? ` ${scriptArgs.join(' ')}` : '';
+          const displayName = workspaceName === 'root'
+            ? `${group.name}${scriptName}`
+            : `${workspaceName}: ${group.name}${scriptName}`;
+
+          const args: string[] = [];
+          if (group.scriptArgs) {
+            if (Array.isArray(group.scriptArgs)) {
+              args.push(...group.scriptArgs);
+            } else {
+              args.push(...group.scriptArgs.split(/\s+/));
+            }
           }
-          configAdditions.push(entry);
-        });
-      });
-    }
+          args.push(...scriptArgs);
 
-    console.log(green('Adding'), white(String(configAdditions.length)), green(`from ${LAUNCH_CONFIG}`));
-    configAdditions.forEach((entry: LaunchSpecConfig) => {
-      console.log(green('  Adding'), entry.name);
-      this.#launchSpec.configurations.push(entry);
-    });
-  }
-
-  protected writeLaunchJson(): void {
-    const launchFile = path.resolve(this.#projectRoot, VSCODE, 'launch.json');
-    Deno.writeTextFileSync(launchFile, JSON.stringify(this.#launchSpec, null, 2));
-    console.log(green('Updated'), launchFile);
-  }
-
-  protected addTest(entry: dfs.WalkEntry & { displayPath: string; programPath: string }): void {
-    if (entry.isFile) {
-      console.log(green('  Adding'), entry.displayPath, gray(entry.path));
-      const defaultArgs = this.#runtime === 'deno' ? ['test', '--inspect-brk', '-A'] : [];
-      const runtimeArgs = [...defaultArgs, entry.programPath];
-      const testRuntimeArgs = this.#launchConfig.tests?.runtimeArgs || ['--check'];
-      if (testRuntimeArgs) {
-        testRuntimeArgs.forEach((arg) => {
-          if (defaultArgs.includes(arg)) {
-            console.log(gray(`  Info: runtimeArg "${arg}" is already in the default list`));
-          }
-        });
-        runtimeArgs.push(...testRuntimeArgs);
+          configurations.push({
+            type: 'node',
+            request: 'launch',
+            name: displayName,
+            program: '${workspaceFolder}/' +
+              (workspaceName === 'root' ? group.program : `packages/${workspaceName}/${group.program}`),
+            cwd: '${workspaceFolder}',
+            runtimeExecutable: 'deno',
+            runtimeArgs: group.runtimeArgs || [],
+            args,
+            attachSimplePort: group.port || config.port || 9229,
+            console: group.console || config.console || 'internalConsole',
+            presentation: workspaceName === 'root' ? undefined : {
+              group: workspaceName,
+            },
+            env: { LAUNCHGEN: 'true' },
+          });
+        }
       }
-      const item: LaunchSpecConfig = {
-        type: this.#runtime,
-        request: 'launch',
-        name: `Debug ${entry.displayPath}`,
-        program: '${workspaceFolder}/' + entry.programPath,
-        cwd: '${workspaceFolder}',
-        runtimeExecutable: this.#runtime,
-        runtimeArgs,
-        attachSimplePort: this.#launchConfig.port || 9229,
-        console: this.#launchConfig.console || 'internalConsole',
-        env: { LAUNCHGEN: 'true' },
-      };
-      this.#launchSpec.configurations.push(item);
     }
+
+    console.log(green('Generated'), white(String(configurations.length)), green('configurations for'), workspaceName);
+    return configurations;
   }
 
-  protected isGenerated(config: LaunchSpecConfig): boolean {
+  async #writeLaunchJson(launchJson: LaunchJson): Promise<void> {
+    if (this.#dryRun) {
+      const tempFile = await Deno.makeTempFile({ suffix: '.json' });
+      await Deno.writeTextFile(tempFile, JSON.stringify(launchJson, null, 2));
+      console.log(green('Dry run - would update'), this.#projectRoot.path + '/.vscode/launch.json');
+      console.log(green('Generated content written to:'), tempFile);
+      return;
+    }
+
+    const vscodeDirSpec = new FolderSpec(this.#projectRoot, '.vscode');
+    await vscodeDirSpec.ensureDir();
+
+    const launchFile = new FileSpec(vscodeDirSpec, 'launch.json');
+    await launchFile.writeJson(launchJson);
+  }
+
+  #isGenerated(config: LaunchConfiguration): boolean {
     return config.env?.LAUNCHGEN === 'true';
   }
 }
-
-// --- Helper Functions --------------------------------------------------------
-
-// --- Main Execution ----------------------------------------------------------
