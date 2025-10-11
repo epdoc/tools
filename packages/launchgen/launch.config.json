@@ -2,13 +2,11 @@
   "launch": {
     "groups": [
       {
-        "id": ".",
-        "name": "main",
+        "id": "launchgen",
+        "name": "main.ts",
         "program": "./main.ts",
         "runtimeArgs": [
-          "run",
-          "-A",
-          "--inspect-brk"
+          "run"
         ],
         "scripts": [
           "",

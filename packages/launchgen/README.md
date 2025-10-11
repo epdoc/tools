@@ -149,6 +149,21 @@ Groups define sets of related launch configurations. Each group can target files
 | `integratedTerminal` | VS Code integrated terminal     | Interactive apps, colored output |
 | `externalTerminal`   | External terminal window        | Complex terminal interactions    |
 
+### Debug Flags: `--inspect` vs `--inspect-brk`
+
+Both flags enable debugging for Deno processes, but they behave differently:
+
+- **`--inspect`**: Starts the debugger and allows a debugger client to attach, but code runs immediately. Use this for attaching to already running applications.
+
+- **`--inspect-brk`**: Starts the debugger and pauses execution on the first line, waiting for the debugger to connect before proceeding.
+
+**For VS Code launch configurations, `--inspect-brk` is almost always preferred** because it:
+- Ensures the debugger attaches before any code runs
+- Allows setting breakpoints and stepping through from the very beginning
+- Prevents missing early execution that might contain bugs
+
+The tool will warn you if configurations are missing debug flags entirely.
+
 ## 🏢 Monorepo Support
 
 ### Workspace Configuration

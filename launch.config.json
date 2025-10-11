@@ -16,8 +16,7 @@
         ],
         "runtimeArgs": [
           "test",
-          "-A",
-          "--inspect-brk"
+          "-A"
         ]
       },
       {
@@ -28,8 +27,7 @@
         ],
         "runtimeArgs": [
           "run",
-          "-A",
-          "--inspect-brk"
+          "-A"
         ]
       }
     ]

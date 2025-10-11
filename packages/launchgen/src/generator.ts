@@ -27,28 +27,43 @@ export class LaunchGenerator {
 
     console.log(green('Retaining'), white(String(manualConfigs.length)), green('manual configurations'));
 
+    const rootConfig = await this.processWorkspace(this.#projectRoot, {}, true);
+    const topLevelConsole = rootConfig.console || 'internalConsole';
+    const topLevelPort = rootConfig.port || 9229;
+
     // Process workspaces first
     for (const workspace of workspaces) {
-      const rootConfig = await this.processWorkspace(this.#projectRoot, {}, true);
       const workspaceConfig = await this.processWorkspace(workspace, rootConfig);
       const workspaceName = workspace.path.substring(this.#projectRoot.path.length + 1).split('/').pop() || 'unknown';
       const workspaceConfigs = await this.generateConfigurations(
         workspace,
         workspaceConfig,
         workspaceName,
-        existingLaunch,
+        topLevelConsole,
+        topLevelPort,
       );
       configurations.push(...workspaceConfigs);
     }
 
     // Only process root if no workspaces, or for files outside workspace directories
     if (workspaces.length === 0) {
-      const rootConfig = await this.processWorkspace(this.#projectRoot, {}, true);
-      const rootConfigs = await this.generateConfigurations(this.#projectRoot, rootConfig, 'root', existingLaunch);
+      const rootConfigs = await this.generateConfigurations(
+        this.#projectRoot,
+        rootConfig,
+        'root',
+        topLevelConsole,
+        topLevelPort,
+      );
       configurations.push(...rootConfigs);
     }
 
-    await this.#writeLaunchJson({ ...existingLaunch, configurations });
+    await this.#writeLaunchJson({ 
+      version: existingLaunch.version,
+      attachSimplePort: topLevelPort,
+      console: topLevelConsole,
+      configurations,
+      ...existingLaunch.compounds && { compounds: existingLaunch.compounds }
+    });
     if (!this.#dryRun) {
       console.log(green('Updated'), this.#projectRoot.path + '/.vscode/launch.json');
     }
@@ -149,7 +164,8 @@ export class LaunchGenerator {
     workspace: FolderSpec,
     config: LaunchConfig,
     workspaceName: string,
-    existingLaunch: LaunchJson,
+    topLevelConsole: string,
+    topLevelPort: number,
   ): Promise<LaunchConfiguration[]> {
     const configurations: LaunchConfiguration[] = [];
 
@@ -170,19 +186,17 @@ export class LaunchGenerator {
           const port = group.port || config.port || 9229;
           const consoleType = group.console || config.console || 'internalConsole';
 
-          // Get top-level defaults from existing launch.json
-          const topLevelPort = existingLaunch.attachSimplePort || 9229;
-          const topLevelConsole = existingLaunch.console || 'internalConsole';
+          const runtimeArgs = group.runtimeArgs || [];
 
           const launchConfig: LaunchConfiguration = {
             type: 'node',
             request: 'launch',
             name: displayName,
             program: '${workspaceFolder}/' +
-              (workspaceName === 'root' ? relativePath : `${workspaceName}/${relativePath}`),
+              (workspaceName === 'root' ? relativePath : `packages/${workspaceName}/${relativePath}`),
             cwd: '${workspaceFolder}',
             runtimeExecutable: 'deno',
-            runtimeArgs: group.runtimeArgs || [],
+            runtimeArgs,
             env: { LAUNCHGEN: 'true' },
           };
 
@@ -227,9 +241,7 @@ export class LaunchGenerator {
           const port = group.port || config.port || 9229;
           const consoleType = group.console || config.console || 'internalConsole';
 
-          // Get top-level defaults from existing launch.json
-          const topLevelPort = existingLaunch.attachSimplePort || 9229;
-          const topLevelConsole = existingLaunch.console || 'internalConsole';
+          const runtimeArgs = group.runtimeArgs || [];
 
           const launchConfig: LaunchConfiguration = {
             type: 'node',
@@ -239,7 +251,7 @@ export class LaunchGenerator {
               (workspaceName === 'root' ? group.program : `packages/${workspaceName}/${group.program}`),
             cwd: '${workspaceFolder}',
             runtimeExecutable: 'deno',
-            runtimeArgs: group.runtimeArgs || [],
+            runtimeArgs,
             args,
             env: { LAUNCHGEN: 'true' },
           };

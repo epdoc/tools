@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.3] - 2025-10-11
+
+- Resolved the duplicate --allow-all flag mystery by removing -A from the configuration.
+
 ## [1.0.0-alpha.2] - 2025-10-11
 
 - Restrict launch.config.json creation to project root only

@@ -1,7 +1,7 @@
 {
   "name": "@epdoc/launchgen",
   "description": "Generate a launch.json file for use with VSCode",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "author": {
     "name": "James Pravetz",
     "email": "jpravetz@epdoc.com"

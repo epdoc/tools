@@ -180,8 +180,8 @@ Deno.test('LaunchGenerator - custom groups with program and scripts', async () =
     // Check configuration details
     const helpConfig = cliConfigs.find((c) => c.name.includes('--help'));
     assertExists(helpConfig);
-    assertEquals(helpConfig.attachSimplePort, 9230);
-    assertEquals(helpConfig.console, 'integratedTerminal');
+    assertEquals(helpConfig.attachSimplePort ?? launchJson.attachSimplePort, 9230);
+    assertEquals(helpConfig.console ?? launchJson.console, 'integratedTerminal');
     assertEquals(helpConfig.args, ['--verbose', '--help']);
   } finally {
     await Deno.remove(root.path, { recursive: true });
@@ -290,8 +290,8 @@ Deno.test('LaunchGenerator - configuration merging between deno.json and launch.
     // Should use merged configuration
     const testConfig = launchJson.configurations.find((c) => c.name === 'example.test.ts');
     assertExists(testConfig);
-    assertEquals(testConfig.attachSimplePort, 9230); // From launch.config.json
-    assertEquals(testConfig.console, 'externalTerminal'); // From launch.config.json
+    assertEquals(testConfig.attachSimplePort ?? launchJson.attachSimplePort, 9230); // From launch.config.json
+    assertEquals(testConfig.console ?? launchJson.console, 'externalTerminal'); // From launch.config.json
     assertEquals(testConfig.runtimeArgs, ['test', '-A', '--inspect-brk']); // Merged from launch.config.json
   } finally {
     await Deno.remove(root.path, { recursive: true });

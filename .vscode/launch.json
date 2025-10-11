@@ -1,17 +1,18 @@
 {
   "version": "0.2.0",
+  "attachSimplePort": 9229,
+  "console": "internalConsole",
   "configurations": [
     {
       "type": "node",
       "request": "launch",
       "name": "launchgen: test/utils.test.ts",
-      "program": "${workspaceFolder}/launchgen/test/utils.test.ts",
+      "program": "${workspaceFolder}/packages/launchgen/test/utils.test.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "env": {
         "LAUNCHGEN": "true"
@@ -24,13 +25,12 @@
       "type": "node",
       "request": "launch",
       "name": "launchgen: test/file-finder.test.ts",
-      "program": "${workspaceFolder}/launchgen/test/file-finder.test.ts",
+      "program": "${workspaceFolder}/packages/launchgen/test/file-finder.test.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "env": {
         "LAUNCHGEN": "true"
@@ -43,13 +43,12 @@
       "type": "node",
       "request": "launch",
       "name": "launchgen: test/config-loader.test.ts",
-      "program": "${workspaceFolder}/launchgen/test/config-loader.test.ts",
+      "program": "${workspaceFolder}/packages/launchgen/test/config-loader.test.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "env": {
         "LAUNCHGEN": "true"
@@ -62,13 +61,12 @@
       "type": "node",
       "request": "launch",
       "name": "launchgen: test/generator.test.ts",
-      "program": "${workspaceFolder}/launchgen/test/generator.test.ts",
+      "program": "${workspaceFolder}/packages/launchgen/test/generator.test.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "env": {
         "LAUNCHGEN": "true"
@@ -80,14 +78,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "launchgen: main",
+      "name": "launchgen: main.ts",
       "program": "${workspaceFolder}/packages/launchgen/./main.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "run",
-        "-A",
-        "--inspect-brk"
+        "run"
       ],
       "args": [],
       "env": {
@@ -100,14 +96,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "launchgen: main -h",
+      "name": "launchgen: main.ts -h",
       "program": "${workspaceFolder}/packages/launchgen/./main.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "run",
-        "-A",
-        "--inspect-brk"
+        "run"
       ],
       "args": [
         "-h"
@@ -122,14 +116,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "launchgen: main --init",
+      "name": "launchgen: main.ts --init",
       "program": "${workspaceFolder}/packages/launchgen/./main.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "run",
-        "-A",
-        "--inspect-brk"
+        "run"
       ],
       "args": [
         "--init"
@@ -144,14 +136,12 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "launchgen: main -n",
+      "name": "launchgen: main.ts -n",
       "program": "${workspaceFolder}/packages/launchgen/./main.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
-        "run",
-        "-A",
-        "--inspect-brk"
+        "run"
       ],
       "args": [
         "-n"
@@ -167,13 +157,12 @@
       "type": "node",
       "request": "launch",
       "name": "bump: test/app.test.ts",
-      "program": "${workspaceFolder}/bump/test/app.test.ts",
+      "program": "${workspaceFolder}/packages/bump/test/app.test.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "env": {
         "LAUNCHGEN": "true"
@@ -186,13 +175,12 @@
       "type": "node",
       "request": "launch",
       "name": "bump: test/git.test.ts",
-      "program": "${workspaceFolder}/bump/test/git.test.ts",
+      "program": "${workspaceFolder}/packages/bump/test/git.test.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "env": {
         "LAUNCHGEN": "true"
@@ -205,13 +193,12 @@
       "type": "node",
       "request": "launch",
       "name": "bump: test/git-md.test.ts",
-      "program": "${workspaceFolder}/bump/test/git-md.test.ts",
+      "program": "${workspaceFolder}/packages/bump/test/git-md.test.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "test",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "env": {
         "LAUNCHGEN": "true"
@@ -229,8 +216,7 @@
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "args": [],
       "env": {
@@ -249,8 +235,7 @@
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "args": [
         "-h"
@@ -271,8 +256,7 @@
       "runtimeExecutable": "deno",
       "runtimeArgs": [
         "run",
-        "-A",
-        "--inspect-brk"
+        "-A"
       ],
       "args": [
         "-n"
