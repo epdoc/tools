@@ -19,6 +19,8 @@ export type LaunchJson = {
   version: string;
   configurations: LaunchConfiguration[];
   compounds?: unknown[];
+  attachSimplePort?: number;
+  console?: string;
 };
 
 export type Group = {

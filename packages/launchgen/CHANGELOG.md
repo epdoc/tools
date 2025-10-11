@@ -2,14 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.2] - 2025-10-11
+
+- Restrict launch.config.json creation to project root only
+- Optimize launch configuration output by omitting default port and console values
+- Compare port and console against top-level launch.json values instead of hardcoded defaults
+
 ## [1.0.0] - 2025-10-11
 
 **🎉 Major Release - Complete Rewrite**
 
-This is a major release with significant breaking changes and new features. The tool has been completely rewritten with a modern architecture and comprehensive test suite.
+This is a major release with significant breaking changes and new features. The tool has been completely rewritten with
+a modern architecture and comprehensive test suite.
 
 ### ✨ New Features
-- **Workspace-Based Organization**: Launch configurations now use colon notation (`workspace: filename`) and are visually grouped in VS Code's debug dropdown
+
+- **Workspace-Based Organization**: Launch configurations now use colon notation (`workspace: filename`) and are
+  visually grouped in VS Code's debug dropdown
 - **Enhanced Monorepo Support**: Full workspace support with hierarchical configuration merging
 - **Auto-Generation**: Automatic creation of `launch.config.json` with sensible defaults when no configuration exists
 - **Executable Export Discovery**: Automatically creates launch configurations for executable exports in `deno.json`
@@ -17,29 +26,36 @@ This is a major release with significant breaking changes and new features. The 
 - **Modern Architecture**: Complete rewrite with TypeScript classes using private fields (`#`) and protected methods
 
 ### 🔧 Configuration Changes
-- **New Configuration Structure**: Groups now support both file-based (`includes`) and program-based (`program`) targeting
-- **Enhanced Exclusion Patterns**: Default exclusions now include `**/.*` and `**/.*/**` for comprehensive hidden file/folder exclusion
+
+- **New Configuration Structure**: Groups now support both file-based (`includes`) and program-based (`program`)
+  targeting
+- **Enhanced Exclusion Patterns**: Default exclusions now include `**/.*` and `**/.*/**` for comprehensive hidden
+  file/folder exclusion
 - **Hierarchical Merging**: Improved configuration merging between root and workspace levels
 - **Presentation Grouping**: VS Code presentation properties for visual organization
 
 ### 🚀 CLI Improvements
+
 - **New `--init` Flag**: Force regenerate configuration files with current defaults
 - **Enhanced `--dry-run`**: Better preview of changes with temporary file output
 - **Improved Logging**: Detailed feedback about configuration generation and file discovery
 
 ### 🏗️ Architecture Changes
+
 - **Class-Based Design**: `LaunchGenerator`, `ConfigLoader`, `FileFinder` classes with proper encapsulation
 - **Type Safety**: Comprehensive TypeScript types and interfaces
 - **Modern Dependencies**: Updated to latest Deno standard library and `@epdoc/fs`
 - **Robust File Handling**: Improved glob pattern matching and file discovery
 
 ### 🧪 Testing
+
 - **Comprehensive Test Suite**: Unit tests for all major components
 - **BDD Syntax**: Tests use `describe`/`it` structure for clear organization
 - **Isolated Testing**: Temporary file structures for test isolation
 - **Edge Case Coverage**: Tests for complex scenarios and error conditions
 
 ### 💥 Breaking Changes
+
 - **Workspace Naming**: Changed from slash notation to colon notation (`workspace: file`)
 - **Configuration Structure**: New group-based configuration format
 - **CLI Interface**: Updated command-line options and behavior
@@ -47,6 +63,7 @@ This is a major release with significant breaking changes and new features. The 
 - **Dependencies**: Requires Deno 2.4+ and updated dependencies
 
 ### 📚 Documentation
+
 - **Complete README Rewrite**: Comprehensive user guide with examples and migration information
 - **Technical Specification**: Detailed SPEC.md for implementation reference
 - **Migration Guide**: Clear upgrade path from v0.x to v1.0.0

@@ -54,7 +54,7 @@ describe('ConfigLoader', () => {
       });
 
       const configLoader = new ConfigLoader();
-      const config = await configLoader.loadAndMerge(tempDir);
+      const config = await configLoader.loadAndMerge(tempDir, false, true);
 
       expect(config.groups).toHaveLength(2);
       expect(config.port).toBe(9229);

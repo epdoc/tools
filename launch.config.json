@@ -11,6 +11,9 @@
       {
         "id": "test",
         "name": "Tests",
+        "includes": [
+          "**/*.test.ts"
+        ],
         "runtimeArgs": [
           "test",
           "-A",

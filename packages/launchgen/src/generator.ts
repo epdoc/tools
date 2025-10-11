@@ -29,17 +29,22 @@ export class LaunchGenerator {
 
     // Process workspaces first
     for (const workspace of workspaces) {
-      const rootConfig = await this.processWorkspace(this.#projectRoot, {});
+      const rootConfig = await this.processWorkspace(this.#projectRoot, {}, true);
       const workspaceConfig = await this.processWorkspace(workspace, rootConfig);
       const workspaceName = workspace.path.substring(this.#projectRoot.path.length + 1).split('/').pop() || 'unknown';
-      const workspaceConfigs = await this.generateConfigurations(workspace, workspaceConfig, workspaceName);
+      const workspaceConfigs = await this.generateConfigurations(
+        workspace,
+        workspaceConfig,
+        workspaceName,
+        existingLaunch,
+      );
       configurations.push(...workspaceConfigs);
     }
 
     // Only process root if no workspaces, or for files outside workspace directories
     if (workspaces.length === 0) {
-      const rootConfig = await this.processWorkspace(this.#projectRoot, {});
-      const rootConfigs = await this.generateConfigurations(this.#projectRoot, rootConfig, 'root');
+      const rootConfig = await this.processWorkspace(this.#projectRoot, {}, true);
+      const rootConfigs = await this.generateConfigurations(this.#projectRoot, rootConfig, 'root', existingLaunch);
       configurations.push(...rootConfigs);
     }
 
@@ -105,9 +110,13 @@ export class LaunchGenerator {
     return workspaces;
   }
 
-  protected async processWorkspace(workspace: FolderSpec, parentConfig: LaunchConfig): Promise<LaunchConfig> {
+  protected async processWorkspace(
+    workspace: FolderSpec,
+    parentConfig: LaunchConfig,
+    isProjectRoot = false,
+  ): Promise<LaunchConfig> {
     const configLoader = new ConfigLoader();
-    const workspaceConfig = await configLoader.loadAndMerge(workspace, this.#init);
+    const workspaceConfig = await configLoader.loadAndMerge(workspace, this.#init, isProjectRoot);
     return this.#mergeConfigs(parentConfig, workspaceConfig);
   }
 
@@ -140,6 +149,7 @@ export class LaunchGenerator {
     workspace: FolderSpec,
     config: LaunchConfig,
     workspaceName: string,
+    existingLaunch: LaunchJson,
   ): Promise<LaunchConfiguration[]> {
     const configurations: LaunchConfiguration[] = [];
 
@@ -157,7 +167,14 @@ export class LaunchGenerator {
 
           console.log(green('  Adding'), displayName);
 
-          configurations.push({
+          const port = group.port || config.port || 9229;
+          const consoleType = group.console || config.console || 'internalConsole';
+
+          // Get top-level defaults from existing launch.json
+          const topLevelPort = existingLaunch.attachSimplePort || 9229;
+          const topLevelConsole = existingLaunch.console || 'internalConsole';
+
+          const launchConfig: LaunchConfiguration = {
             type: 'node',
             request: 'launch',
             name: displayName,
@@ -166,13 +183,25 @@ export class LaunchGenerator {
             cwd: '${workspaceFolder}',
             runtimeExecutable: 'deno',
             runtimeArgs: group.runtimeArgs || [],
-            attachSimplePort: group.port || config.port || 9229,
-            console: group.console || config.console || 'internalConsole',
-            presentation: workspaceName === 'root' ? undefined : {
-              group: workspaceName,
-            },
             env: { LAUNCHGEN: 'true' },
-          });
+          };
+
+          // Only include port if it differs from top-level
+          if (port !== topLevelPort) {
+            launchConfig.attachSimplePort = port;
+          }
+
+          // Only include console if it differs from top-level
+          if (consoleType !== topLevelConsole) {
+            launchConfig.console = consoleType;
+          }
+
+          // Only include presentation for workspace files
+          if (workspaceName !== 'root') {
+            launchConfig.presentation = { group: workspaceName };
+          }
+
+          configurations.push(launchConfig);
         }
       } else if (group.program) {
         const scripts = group.scripts || [''];
@@ -195,7 +224,14 @@ export class LaunchGenerator {
           }
           args.push(...scriptArgs);
 
-          configurations.push({
+          const port = group.port || config.port || 9229;
+          const consoleType = group.console || config.console || 'internalConsole';
+
+          // Get top-level defaults from existing launch.json
+          const topLevelPort = existingLaunch.attachSimplePort || 9229;
+          const topLevelConsole = existingLaunch.console || 'internalConsole';
+
+          const launchConfig: LaunchConfiguration = {
             type: 'node',
             request: 'launch',
             name: displayName,
@@ -205,13 +241,25 @@ export class LaunchGenerator {
             runtimeExecutable: 'deno',
             runtimeArgs: group.runtimeArgs || [],
             args,
-            attachSimplePort: group.port || config.port || 9229,
-            console: group.console || config.console || 'internalConsole',
-            presentation: workspaceName === 'root' ? undefined : {
-              group: workspaceName,
-            },
             env: { LAUNCHGEN: 'true' },
-          });
+          };
+
+          // Only include port if it differs from top-level
+          if (port !== topLevelPort) {
+            launchConfig.attachSimplePort = port;
+          }
+
+          // Only include console if it differs from top-level
+          if (consoleType !== topLevelConsole) {
+            launchConfig.console = consoleType;
+          }
+
+          // Only include presentation for workspace files
+          if (workspaceName !== 'root') {
+            launchConfig.presentation = { group: workspaceName };
+          }
+
+          configurations.push(launchConfig);
         }
       }
     }

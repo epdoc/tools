@@ -2,7 +2,7 @@ import { FileSpec, type FolderSpec } from '@epdoc/fs';
 import type { DenoJson, Group, LaunchConfig } from './types.ts';
 
 export class ConfigLoader {
-  async loadAndMerge(workspaceDir: FolderSpec, forceRegenerate = false): Promise<LaunchConfig> {
+  async loadAndMerge(workspaceDir: FolderSpec, forceRegenerate = false, isProjectRoot = false): Promise<LaunchConfig> {
     const denoJsonFile = new FileSpec(workspaceDir, 'deno.json');
     const launchConfigFile = new FileSpec(workspaceDir, 'launch.config.json');
 
@@ -24,9 +24,9 @@ export class ConfigLoader {
       }
     }
 
-    // Auto-generate if no configuration exists or if forced
-    const shouldAutoGenerate = forceRegenerate || (!config.groups &&
-      !(await denoJsonFile.getIsFile() && await this.#hasLaunchProperty(denoJsonFile)));
+    // Auto-generate if no configuration exists or if forced (only at project root)
+    const shouldAutoGenerate = isProjectRoot && (forceRegenerate || (!config.groups &&
+      !(await denoJsonFile.getIsFile() && await this.#hasLaunchProperty(denoJsonFile))));
 
     if (shouldAutoGenerate) {
       await this.#autoGenerateConfig(workspaceDir, denoJsonFile);
