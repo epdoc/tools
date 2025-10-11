@@ -57,12 +57,12 @@ export class LaunchGenerator {
       configurations.push(...rootConfigs);
     }
 
-    await this.#writeLaunchJson({ 
+    await this.#writeLaunchJson({
       version: existingLaunch.version,
       attachSimplePort: topLevelPort,
       console: topLevelConsole,
       configurations,
-      ...existingLaunch.compounds && { compounds: existingLaunch.compounds }
+      ...existingLaunch.compounds && { compounds: existingLaunch.compounds },
     });
     if (!this.#dryRun) {
       console.log(green('Updated'), this.#projectRoot.path + '/.vscode/launch.json');
@@ -187,17 +187,23 @@ export class LaunchGenerator {
           const consoleType = group.console || config.console || 'internalConsole';
 
           const runtimeArgs = group.runtimeArgs || [];
+          const programPath = '${workspaceFolder}/' + file.path.substring(this.#projectRoot.path.length + 1);
 
           const launchConfig: LaunchConfiguration = {
             type: 'node',
             request: 'launch',
             name: displayName,
-            program: '${workspaceFolder}/' + file.path.substring(this.#projectRoot.path.length + 1),
             cwd: '${workspaceFolder}',
             runtimeExecutable: 'deno',
-            runtimeArgs,
             env: { LAUNCHGEN: 'true' },
           };
+
+          if (runtimeArgs[0] === 'test') {
+            launchConfig.runtimeArgs = [...runtimeArgs, programPath];
+          } else {
+            launchConfig.runtimeArgs = runtimeArgs;
+            launchConfig.program = programPath;
+          }
 
           // Only include port if it differs from top-level
           if (port !== topLevelPort) {
@@ -247,7 +253,9 @@ export class LaunchGenerator {
             request: 'launch',
             name: displayName,
             program: '${workspaceFolder}/' +
-              (workspaceName === 'root' ? group.program : `${workspace.path.substring(this.#projectRoot.path.length + 1)}/${group.program}`),
+              (workspaceName === 'root'
+                ? group.program
+                : `${workspace.path.substring(this.#projectRoot.path.length + 1)}/${group.program}`),
             cwd: '${workspaceFolder}',
             runtimeExecutable: 'deno',
             runtimeArgs,

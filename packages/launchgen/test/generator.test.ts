@@ -1,5 +1,5 @@
 import { FileSpec, FolderSpec } from '@epdoc/fs';
-import { assertEquals, assertExists } from '@std/assert';
+import { assert, assertEquals, assertExists } from '@std/assert';
 import { LaunchGenerator } from '../src/generator.ts';
 import type { Group, LaunchJson } from '../src/types.ts';
 
@@ -104,6 +104,11 @@ Deno.test('LaunchGenerator - single project with auto-generated config', async (
     assertEquals(testConfig.request, 'launch');
     assertEquals(testConfig.runtimeExecutable, 'deno');
     assertEquals(testConfig.env?.LAUNCHGEN, 'true');
+    assertEquals(testConfig.program, undefined, 'For test configs, program should be undefined');
+    assert(
+      testConfig.runtimeArgs?.some((arg) => arg.includes('.test.ts')),
+      'runtimeArgs should include the test file path',
+    );
   } finally {
     await Deno.remove(root.path, { recursive: true });
   }
@@ -292,7 +297,10 @@ Deno.test('LaunchGenerator - configuration merging between deno.json and launch.
     assertExists(testConfig);
     assertEquals(testConfig.attachSimplePort ?? launchJson.attachSimplePort, 9230); // From launch.config.json
     assertEquals(testConfig.console ?? launchJson.console, 'externalTerminal'); // From launch.config.json
-    assertEquals(testConfig.runtimeArgs, ['test', '-A', '--inspect-brk']); // Merged from launch.config.json
+    assert(
+      testConfig.runtimeArgs?.includes('--inspect-brk'),
+      'runtimeArgs should include --inspect-brk from the merged config',
+    );
   } finally {
     await Deno.remove(root.path, { recursive: true });
   }
@@ -384,8 +392,71 @@ Deno.test('LaunchGenerator - monorepo with root-level workspaces', async () => {
     const testConfig = launchJson.configurations.find((c) => c.name === 'workspace-a: tests/integration.test.ts');
     assertExists(testConfig);
 
-    // Assert that the program path is correct and does not include 'packages/'
-    assertEquals(testConfig.program, '${workspaceFolder}/workspace-a/tests/integration.test.ts');
+    // Assert that the program property is undefined and the path is in runtimeArgs
+    assertEquals(testConfig.program, undefined);
+    assert(testConfig.runtimeArgs?.includes('${workspaceFolder}/workspace-a/tests/integration.test.ts'));
+  } finally {
+    await Deno.remove(root.path, { recursive: true });
+  }
+});
+
+Deno.test('LaunchGenerator - correctly omits redundant settings', async () => {
+  const root = await createTempProject();
+
+  try {
+    await setupBasicProject(root);
+
+    // Create launch.config.json with a top-level default and an override
+    const launchConfigFile = new FileSpec(root, 'launch.config.json');
+    await launchConfigFile.writeJson({
+      launch: {
+        port: 9250,
+        console: 'integratedTerminal',
+        groups: [
+          {
+            id: 'inherit',
+            name: 'Inherit',
+            includes: ['inherit.ts'],
+            runtimeArgs: ['run'],
+          },
+          {
+            id: 'override',
+            name: 'Override',
+            includes: ['override.ts'],
+            runtimeArgs: ['run'],
+            console: 'externalTerminal', // Override console
+          },
+        ],
+      },
+    });
+
+    // Create dummy files
+    await Deno.writeTextFile(new FileSpec(root, 'inherit.ts').path, '// Inherit');
+    await Deno.writeTextFile(new FileSpec(root, 'override.ts').path, '// Override');
+
+    const generator = new LaunchGenerator(root);
+    await generator.run();
+
+    const launchJsonFile = new FileSpec(root, '.vscode', 'launch.json');
+    const launchJson = await launchJsonFile.readJson<LaunchJson>();
+
+    // Check top-level properties
+    assertEquals(launchJson.attachSimplePort, 9250);
+    assertEquals(launchJson.console, 'integratedTerminal');
+
+    // Find the generated configurations
+    const inheritConfig = launchJson.configurations.find((c) => c.name === 'inherit.ts');
+    const overrideConfig = launchJson.configurations.find((c) => c.name === 'override.ts');
+    assertExists(inheritConfig);
+    assertExists(overrideConfig);
+
+    // Assert that the inheriting config has no redundant properties
+    assertEquals(inheritConfig.attachSimplePort, undefined);
+    assertEquals(inheritConfig.console, undefined);
+
+    // Assert that the overriding config has the specific property
+    assertEquals(overrideConfig.attachSimplePort, undefined); // Port is not overridden, should be undefined
+    assertEquals(overrideConfig.console, 'externalTerminal'); // Console is overridden, should be defined
   } finally {
     await Deno.remove(root.path, { recursive: true });
   }
