@@ -192,8 +192,7 @@ export class LaunchGenerator {
             type: 'node',
             request: 'launch',
             name: displayName,
-            program: '${workspaceFolder}/' +
-              (workspaceName === 'root' ? relativePath : `packages/${workspaceName}/${relativePath}`),
+            program: '${workspaceFolder}/' + file.path.substring(this.#projectRoot.path.length + 1),
             cwd: '${workspaceFolder}',
             runtimeExecutable: 'deno',
             runtimeArgs,
@@ -248,7 +247,7 @@ export class LaunchGenerator {
             request: 'launch',
             name: displayName,
             program: '${workspaceFolder}/' +
-              (workspaceName === 'root' ? group.program : `packages/${workspaceName}/${group.program}`),
+              (workspaceName === 'root' ? group.program : `${workspace.path.substring(this.#projectRoot.path.length + 1)}/${group.program}`),
             cwd: '${workspaceFolder}',
             runtimeExecutable: 'deno',
             runtimeArgs,

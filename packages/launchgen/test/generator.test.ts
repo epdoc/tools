@@ -341,3 +341,52 @@ Deno.test('LaunchGenerator - executable exports auto-generation', async () => {
     await Deno.remove(root.path, { recursive: true });
   }
 });
+
+async function setupRootMonorepoProject(root: FolderSpec): Promise<void> {
+  await setupBasicProject(root);
+
+  // Update deno.json with root-level workspaces
+  const denoJsonFile = new FileSpec(root, 'deno.json');
+  await denoJsonFile.writeJson({
+    name: 'test-root-monorepo',
+    version: '1.0.0',
+    workspaces: ['workspace-a', 'workspace-b'],
+  });
+
+  // Create workspace A
+  const workspaceA = new FolderSpec(root, 'workspace-a');
+  await workspaceA.ensureDir();
+  const denoJsonA = new FileSpec(workspaceA, 'deno.json');
+  await denoJsonA.writeJson({ name: 'workspace-a', version: '1.0.0' });
+
+  // Create workspace B
+  const workspaceB = new FolderSpec(root, 'workspace-b');
+  await workspaceB.ensureDir();
+  const denoJsonB = new FileSpec(workspaceB, 'deno.json');
+  await denoJsonB.writeJson({ name: 'workspace-b', version: '1.0.0' });
+}
+
+Deno.test('LaunchGenerator - monorepo with root-level workspaces', async () => {
+  const root = await createTempProject();
+
+  try {
+    await setupRootMonorepoProject(root);
+
+    const workspaceA = new FolderSpec(root, 'workspace-a');
+    await createTestFiles(workspaceA);
+
+    const generator = new LaunchGenerator(root);
+    await generator.run();
+
+    const launchJsonFile = new FileSpec(root, '.vscode', 'launch.json');
+    const launchJson = await launchJsonFile.readJson<LaunchJson>();
+
+    const testConfig = launchJson.configurations.find((c) => c.name === 'workspace-a: tests/integration.test.ts');
+    assertExists(testConfig);
+
+    // Assert that the program path is correct and does not include 'packages/'
+    assertEquals(testConfig.program, '${workspaceFolder}/workspace-a/tests/integration.test.ts');
+  } finally {
+    await Deno.remove(root.path, { recursive: true });
+  }
+});

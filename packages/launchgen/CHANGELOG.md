@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.4] - 2025-10-11
+
+- fixed issue with monorepos that don\'t have a packages subfolder
+
 ## [1.0.0-alpha.3] - 2025-10-11
 
 - Resolved the duplicate --allow-all flag mystery by removing -A from the configuration.
