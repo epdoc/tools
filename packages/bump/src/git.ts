@@ -40,6 +40,8 @@ ${err}`);
     const allowedFiles = [
       'deno.lock',
       '.vscode/launch.json',
+      'launch.config.json',
+      'README.md',
       'deno.json',
       '.gitignore',
       'launch.config.json',

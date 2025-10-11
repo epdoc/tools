@@ -7,8 +7,7 @@
         "program": "./main.ts",
         "runtimeArgs": [
           "run",
-          "-A",
-          "--inspect-brk"
+          "-A"
         ],
         "scripts": [
           "",
