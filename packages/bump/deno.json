@@ -11,14 +11,14 @@
     ".": "./main.ts"
   },
   "tasks": {
-    "test": "deno test -RWS",
+    "test": "deno test -RWS ",
     "lint": "deno lint main.ts src test",
     "check": "deno check src main.ts test",
     "install": "deno install --global -A -f --config deno.json --name bump main.ts"
   },
   "tests": {
     "include": [
-      "*.test.ts"
+      "**/*.test.ts"
     ]
   },
   "imports": {

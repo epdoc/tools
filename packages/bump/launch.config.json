@@ -1,0 +1,21 @@
+{
+  "launch": {
+    "groups": [
+      {
+        "id": ".",
+        "name": "main",
+        "program": "./main.ts",
+        "runtimeArgs": [
+          "run",
+          "-A",
+          "--inspect-brk"
+        ],
+        "scripts": [
+          "",
+          "-h",
+          "-n"
+        ]
+      }
+    ]
+  }
+}

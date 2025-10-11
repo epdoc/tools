@@ -31,6 +31,7 @@
     "jsr:@std/path@^1.1.2": "1.1.2",
     "jsr:@std/testing@*": "0.225.3",
     "jsr:@std/testing@^1.0.15": "1.0.16",
+    "jsr:@std/testing@^1.0.16": "1.0.16",
     "jsr:@std/testing@~0.225.3": "0.225.3",
     "npm:@types/node@*": "24.2.0",
     "npm:commander@^14.0.1": "14.0.1",
@@ -230,6 +231,15 @@
       "integrity": "sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag=="
     }
   },
+  "remote": {
+    "https://deno.land/std@0.97.0/fmt/colors.ts": "db22b314a2ae9430ae7460ce005e0a7130e23ae1c999157e3bb77cf55800f7e4",
+    "https://deno.land/std@0.97.0/testing/_diff.ts": "961eaf6d9f5b0a8556c9d835bbc6fa74f5addd7d3b02728ba7936ff93364f7a3",
+    "https://deno.land/std@0.97.0/testing/asserts.ts": "341292d12eebc44be4c3c2ca101ba8b6b5859cef2fa69d50c217f9d0bfbcfd1f",
+    "https://deno.land/x/expect@v0.4.0/expect.ts": "1d1856758a750f440d0b65d74f19e5d4829bb76d8e576d05546abd8e7b1dfb9e",
+    "https://deno.land/x/expect@v0.4.0/matchers.ts": "55acf74a3c4a308d079798930f05ab11da2080ec7acd53517193ca90d1296bf7",
+    "https://deno.land/x/expect@v0.4.0/mock.ts": "562d4b1d735d15b0b8e935f342679096b64fe452f86e96714fe8616c0c884914",
+    "https://deno.land/x/expect@v0.4.0/mod.ts": "0304d2430e1e96ba669a8495e24ba606dcc3d152e1f81aaa8da898cea24e36c2"
+  },
   "workspace": {
     "dependencies": [
       "jsr:@std/expect@~0.224.1",
@@ -253,10 +263,13 @@
       "packages/launchgen": {
         "dependencies": [
           "jsr:@epdoc/fs@~0.2.24",
+          "jsr:@epdoc/type@^1.1.17",
           "jsr:@std/assert@^1.0.15",
+          "jsr:@std/expect@^1.0.17",
           "jsr:@std/fmt@^1.0.8",
           "jsr:@std/fs@^1.0.19",
-          "jsr:@std/path@^1.1.2"
+          "jsr:@std/path@^1.1.2",
+          "jsr:@std/testing@^1.0.16"
         ]
       }
     }
