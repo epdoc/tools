@@ -4,6 +4,25 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "launchgen: test/utils.test.ts",
+      "program": "${workspaceFolder}/launchgen/test/utils.test.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "test",
+        "-A",
+        "--inspect-brk"
+      ],
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "launchgen"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "launchgen: test/file-finder.test.ts",
       "program": "${workspaceFolder}/launchgen/test/file-finder.test.ts",
       "cwd": "${workspaceFolder}",
@@ -13,13 +32,11 @@
         "-A",
         "--inspect-brk"
       ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal",
-      "presentation": {
-        "group": "launchgen"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "launchgen"
       }
     },
     {
@@ -34,13 +51,11 @@
         "-A",
         "--inspect-brk"
       ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal",
-      "presentation": {
-        "group": "launchgen"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "launchgen"
       }
     },
     {
@@ -55,13 +70,11 @@
         "-A",
         "--inspect-brk"
       ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal",
-      "presentation": {
-        "group": "launchgen"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "launchgen"
       }
     },
     {
@@ -77,13 +90,11 @@
         "--inspect-brk"
       ],
       "args": [],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal",
-      "presentation": {
-        "group": "launchgen"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "launchgen"
       }
     },
     {
@@ -101,13 +112,11 @@
       "args": [
         "-h"
       ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal",
-      "presentation": {
-        "group": "launchgen"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "launchgen"
       }
     },
     {
@@ -125,13 +134,11 @@
       "args": [
         "--init"
       ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal",
-      "presentation": {
-        "group": "launchgen"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "launchgen"
       }
     },
     {
@@ -149,13 +156,11 @@
       "args": [
         "-n"
       ],
-      "attachSimplePort": 9229,
-      "console": "integratedTerminal",
-      "presentation": {
-        "group": "launchgen"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "launchgen"
       }
     },
     {
@@ -170,13 +175,11 @@
         "-A",
         "--inspect-brk"
       ],
-      "attachSimplePort": 9229,
-      "console": "internalConsole",
-      "presentation": {
-        "group": "bump"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "bump"
       }
     },
     {
@@ -191,13 +194,11 @@
         "-A",
         "--inspect-brk"
       ],
-      "attachSimplePort": 9229,
-      "console": "internalConsole",
-      "presentation": {
-        "group": "bump"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "bump"
       }
     },
     {
@@ -212,13 +213,11 @@
         "-A",
         "--inspect-brk"
       ],
-      "attachSimplePort": 9229,
-      "console": "internalConsole",
-      "presentation": {
-        "group": "bump"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "bump"
       }
     },
     {
@@ -234,13 +233,11 @@
         "--inspect-brk"
       ],
       "args": [],
-      "attachSimplePort": 9229,
-      "console": "internalConsole",
-      "presentation": {
-        "group": "bump"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "bump"
       }
     },
     {
@@ -258,13 +255,11 @@
       "args": [
         "-h"
       ],
-      "attachSimplePort": 9229,
-      "console": "internalConsole",
-      "presentation": {
-        "group": "bump"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "bump"
       }
     },
     {
@@ -282,13 +277,11 @@
       "args": [
         "-n"
       ],
-      "attachSimplePort": 9229,
-      "console": "internalConsole",
-      "presentation": {
-        "group": "bump"
-      },
       "env": {
         "LAUNCHGEN": "true"
+      },
+      "presentation": {
+        "group": "bump"
       }
     }
   ]

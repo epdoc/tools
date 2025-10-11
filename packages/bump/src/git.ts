@@ -39,6 +39,7 @@ ${err}`);
     const filesToAdd: string[] = ['.'];
     const allowedFiles = [
       'deno.lock',
+      '.vscode/launch.json',
       'deno.json',
       '.gitignore',
       'launch.config.json',
@@ -81,7 +82,6 @@ ${err}`);
     }
     return undefined;
   }
-
 
   async commit(msgs: string[]): Promise<void> {
     const args = ['commit'];

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.16] - 2025-10-11
+
+- Added .vscode/launch.json as file to allow as part of git commit for workspace.
+
 ## [0.3.15] - 2025-10-06
 
 - Updated dependencies
