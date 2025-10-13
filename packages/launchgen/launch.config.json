@@ -5,9 +5,6 @@
         "id": "launchgen",
         "name": "main.ts",
         "program": "./main.ts",
-        "runtimeArgs": [
-          "run"
-        ],
         "scripts": [
           "",
           "-h",

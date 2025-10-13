@@ -2,6 +2,7 @@ import { FileSpec, FolderSpec } from '@epdoc/fs';
 import { green, white } from '@std/fmt/colors';
 import { globToRegExp } from '@std/path/glob-to-regexp';
 import { ConfigLoader } from './config-loader.ts';
+import * as consts from './consts.ts';
 import { FileFinder } from './file-finder.ts';
 import type { DenoJson, Group, LaunchConfig, LaunchConfiguration, LaunchJson } from './types.ts';
 
@@ -28,8 +29,6 @@ export class LaunchGenerator {
     console.log(green('Retaining'), white(String(manualConfigs.length)), green('manual configurations'));
 
     const rootConfig = await this.processWorkspace(this.#projectRoot, {}, true);
-    const topLevelConsole = rootConfig.console || 'internalConsole';
-    const topLevelPort = rootConfig.port || 9229;
 
     // Process workspaces first
     for (const workspace of workspaces) {
@@ -39,8 +38,6 @@ export class LaunchGenerator {
         workspace,
         workspaceConfig,
         workspaceName,
-        topLevelConsole,
-        topLevelPort,
       );
       configurations.push(...workspaceConfigs);
     }
@@ -51,16 +48,12 @@ export class LaunchGenerator {
         this.#projectRoot,
         rootConfig,
         'root',
-        topLevelConsole,
-        topLevelPort,
       );
       configurations.push(...rootConfigs);
     }
 
     await this.#writeLaunchJson({
       version: existingLaunch.version,
-      attachSimplePort: topLevelPort,
-      console: topLevelConsole,
       configurations,
       ...existingLaunch.compounds && { compounds: existingLaunch.compounds },
     });
@@ -164,8 +157,6 @@ export class LaunchGenerator {
     workspace: FolderSpec,
     config: LaunchConfig,
     workspaceName: string,
-    topLevelConsole: string,
-    topLevelPort: number,
   ): Promise<LaunchConfiguration[]> {
     const configurations: LaunchConfiguration[] = [];
 
@@ -184,8 +175,9 @@ export class LaunchGenerator {
           console.log(green('  Adding'), displayName);
 
           const port = group.port || config.port || 9229;
-          const consoleType = group.console || config.console || 'internalConsole';
+          const consoleType = group.console || config.console || consts.DEFAULT_CONSOLE;
 
+          const runtimeExecutable = group.runtimeExecutable || config.runtimeExecutable || consts.RUNTIME_EXECUTABLE;
           const runtimeArgs = group.runtimeArgs || [];
           const programPath = '${workspaceFolder}/' + file.path.substring(this.#projectRoot.path.length + 1);
 
@@ -194,24 +186,20 @@ export class LaunchGenerator {
             request: 'launch',
             name: displayName,
             cwd: '${workspaceFolder}',
-            runtimeExecutable: 'deno',
+            attachSimplePort: port, // Always include port else deno will try to run a unit test
+            runtimeExecutable: runtimeExecutable,
             env: { LAUNCHGEN: 'true' },
           };
 
           if (runtimeArgs[0] === 'test') {
             launchConfig.runtimeArgs = [...runtimeArgs, programPath];
           } else {
-            launchConfig.runtimeArgs = runtimeArgs;
+            launchConfig.runtimeArgs = [...runtimeArgs];
             launchConfig.program = programPath;
           }
 
-          // Only include port if it differs from top-level
-          if (port !== topLevelPort) {
-            launchConfig.attachSimplePort = port;
-          }
-
-          // Only include console if it differs from top-level
-          if (consoleType !== topLevelConsole) {
+          // Only include console if it differs from the default value
+          if (consoleType !== consts.DEFAULT_CONSOLE) {
             launchConfig.console = consoleType;
           }
 
@@ -243,10 +231,11 @@ export class LaunchGenerator {
           }
           args.push(...scriptArgs);
 
-          const port = group.port || config.port || 9229;
-          const consoleType = group.console || config.console || 'internalConsole';
+          const port = group.port || config.port || consts.DEFAULT_PORT;
+          const consoleType = group.console || config.console || consts.DEFAULT_CONSOLE;
+          const runtimeExecutable = group.runtimeExecutable || config.runtimeExecutable || consts.RUNTIME_EXECUTABLE;
 
-          const runtimeArgs = group.runtimeArgs || [];
+          const runtimeArgs = group.runtimeArgs || consts.DEFAULT_PROGRAM_ARGS || [];
 
           const launchConfig: LaunchConfiguration = {
             type: 'node',
@@ -257,19 +246,15 @@ export class LaunchGenerator {
                 ? group.program
                 : `${workspace.path.substring(this.#projectRoot.path.length + 1)}/${group.program}`),
             cwd: '${workspaceFolder}',
-            runtimeExecutable: 'deno',
-            runtimeArgs,
-            args,
+            attachSimplePort: port,
+            runtimeExecutable: runtimeExecutable,
+            runtimeArgs: runtimeArgs,
+            args: args,
             env: { LAUNCHGEN: 'true' },
           };
 
-          // Only include port if it differs from top-level
-          if (port !== topLevelPort) {
-            launchConfig.attachSimplePort = port;
-          }
-
-          // Only include console if it differs from top-level
-          if (consoleType !== topLevelConsole) {
+          // Only include console if it differs from the default
+          if (consoleType !== consts.DEFAULT_CONSOLE) {
             launchConfig.console = consoleType;
           }
 

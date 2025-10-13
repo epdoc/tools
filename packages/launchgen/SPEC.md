@@ -157,24 +157,29 @@ structure is identical to the `launch` property in `deno.json`.
 
 - If a directory (either project root or a workspace) contains a `deno.json` but does _not_ contain a
   `launch.config.json` or a `launch` property in the `deno.json` file, a `launch.config.json` file will be created.
-- The auto-generated file will contain a top-level `launch` object with default `port`, `console`, and `excludes` values
-  and the following default groups in its `groups` array:
+- The auto-generated file will contain a top-level `launch` object with default `console`, and `excludes` values and the
+  following default groups in its `groups` array:
   1. A "test" group:
      - `id`: `"test"`
      - `name`: `"Tests"`
      - `includes`: `["**/*.test.ts"]`
      - `runtimeArgs`: `["test", "-A", "--inspect-brk"]`
+     - `attachSimplePort`: `9229` (must be set on each configuration for debugger to work)
+
   2. A "run" group:
      - `id`: `"run"`
      - `name`: `"Runnable"`
      - `includes`: `["**/*.run.ts"]`
      - `runtimeArgs`: `["run", "-A", "--inspect-brk"]`
+     - `attachSimplePort`: `9229` (must be set on each configuration for debugger to work)
+
   3. One group for each "executable" export found in the `deno.json` file's `exports` map.
      - An export is considered "executable" if its file path does not end in `mod.ts`.
      - `id`: The export key (e.g., `"my-cli"` or `"."`).
      - `name`: The export key, or filename without extension for main exports (e.g., `"."` becomes `"main"`).
      - `program`: The file path of the export.
      - `runtimeArgs`: `["run", "-A", "--inspect-brk"]`
+     - `attachSimplePort`: `9229` (must be set on each configuration for debugger to work)
      - `scripts`: `[""]`
 
 ### 5.1. Default Excludes

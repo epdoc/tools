@@ -1,10 +1,11 @@
 import { FileSpec, type FolderSpec } from '@epdoc/fs';
+import * as consts from './consts.ts';
 import type { DenoJson, Group, LaunchConfig } from './types.ts';
 
 export class ConfigLoader {
   async loadAndMerge(workspaceDir: FolderSpec, forceRegenerate = false, isProjectRoot = false): Promise<LaunchConfig> {
-    const denoJsonFile = new FileSpec(workspaceDir, 'deno.json');
-    const launchConfigFile = new FileSpec(workspaceDir, 'launch.config.json');
+    const denoJsonFile = new FileSpec(workspaceDir, consts.DENO_JSON_FILE);
+    const launchConfigFile = new FileSpec(workspaceDir, consts.LAUNCH_CONFIG_FILE);
 
     let config: LaunchConfig = {};
 
@@ -77,14 +78,16 @@ export class ConfigLoader {
       {
         id: 'test',
         name: 'Tests',
+        console: consts.DEFAULT_CONSOLE,
         includes: ['**/*.test.ts'],
-        runtimeArgs: ['test', '-A', '--inspect-brk'],
+        runtimeArgs: consts.DEFAULT_TEST_ARGS,
       },
       {
         id: 'run',
         name: 'Runnable',
+        console: consts.DEFAULT_CONSOLE,
         includes: ['**/*.run.ts'],
-        runtimeArgs: ['run', '-A', '--inspect-brk'],
+        runtimeArgs: consts.DEFAULT_RUNTIME_ARGS,
       },
     ];
 
@@ -98,8 +101,9 @@ export class ConfigLoader {
             groups.push({
               id: key,
               name: name,
+              console: consts.DEFAULT_CONSOLE,
               program: filePath,
-              runtimeArgs: ['run', '-A', '--inspect-brk'],
+              runtimeArgs: consts.DEFAULT_RUNTIME_ARGS,
               scripts: [''],
             });
           }
@@ -107,13 +111,14 @@ export class ConfigLoader {
       }
     }
 
-    const launchConfigFile = new FileSpec(workspaceDir, 'launch.config.json');
+    const launchConfigFile = new FileSpec(workspaceDir, consts.LAUNCH_CONFIG_FILE);
     await launchConfigFile.writeJson({
       launch: {
         port: 9229,
-        console: 'internalConsole',
-        excludes: ['node_modules/**', '.git/**', '**/.*', '**/.*/**'],
-        groups,
+        console: consts.DEFAULT_CONSOLE,
+        excludes: consts.DEFAULT_EXCLUDES,
+        runtimeExecutable: consts.RUNTIME_EXECUTABLE,
+        groups: groups,
       },
     });
   }

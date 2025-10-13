@@ -185,7 +185,7 @@ Deno.test('LaunchGenerator - custom groups with program and scripts', async () =
     // Check configuration details
     const helpConfig = cliConfigs.find((c) => c.name.includes('--help'));
     assertExists(helpConfig);
-    assertEquals(helpConfig.attachSimplePort ?? launchJson.attachSimplePort, 9230);
+    assertEquals(helpConfig.attachSimplePort ?? launchJson.port, 9230);
     assertEquals(helpConfig.console ?? launchJson.console, 'integratedTerminal');
     assertEquals(helpConfig.args, ['--verbose', '--help']);
   } finally {
@@ -295,7 +295,7 @@ Deno.test('LaunchGenerator - configuration merging between deno.json and launch.
     // Should use merged configuration
     const testConfig = launchJson.configurations.find((c) => c.name === 'example.test.ts');
     assertExists(testConfig);
-    assertEquals(testConfig.attachSimplePort ?? launchJson.attachSimplePort, 9230); // From launch.config.json
+    assertEquals(testConfig.attachSimplePort ?? launchJson.port, 9230); // From launch.config.json
     assertEquals(testConfig.console ?? launchJson.console, 'externalTerminal'); // From launch.config.json
     assert(
       testConfig.runtimeArgs?.includes('--inspect-brk'),
@@ -441,7 +441,7 @@ Deno.test('LaunchGenerator - correctly omits redundant settings', async () => {
     const launchJson = await launchJsonFile.readJson<LaunchJson>();
 
     // Check top-level properties
-    assertEquals(launchJson.attachSimplePort, 9250);
+    assertEquals(launchJson.port, 9250);
     assertEquals(launchJson.console, 'integratedTerminal');
 
     // Find the generated configurations

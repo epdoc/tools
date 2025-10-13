@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.6] - 2025-10-12
+
+- Fixed issues with setting precise properties required for tests to run
+
 ## [1.0.0-alpha.5] - 2025-10-11
 
 - fixed test coverage and packages bug that was not caught by unit tests

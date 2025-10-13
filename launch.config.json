@@ -5,29 +5,35 @@
     "excludes": [
       "node_modules/**",
       ".git/**",
+      "**/.*",
       "**/.*/**"
     ],
+    "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
     "groups": [
       {
         "id": "test",
         "name": "Tests",
+        "console": "internalConsole",
         "includes": [
           "**/*.test.ts"
         ],
         "runtimeArgs": [
           "test",
-          "-A"
+          "-A",
+          "--inspect-brk"
         ]
       },
       {
         "id": "run",
         "name": "Runnable",
+        "console": "internalConsole",
         "includes": [
           "**/*.run.ts"
         ],
         "runtimeArgs": [
           "run",
-          "-A"
+          "-A",
+          "--inspect-brk"
         ]
       }
     ]

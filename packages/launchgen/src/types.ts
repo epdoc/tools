@@ -19,7 +19,7 @@ export type LaunchJson = {
   version: string;
   configurations: LaunchConfiguration[];
   compounds?: unknown[];
-  attachSimplePort?: number;
+  port?: number;
   console?: string;
 };
 
@@ -29,6 +29,7 @@ export type Group = {
   includes?: string[];
   excludes?: string[];
   program?: string;
+  runtimeExecutable?: string;
   runtimeArgs?: string[];
   scriptArgs?: string | string[];
   scripts?: (string | string[])[];
@@ -39,6 +40,7 @@ export type Group = {
 export type LaunchConfig = {
   port?: number;
   console?: string;
+  runtimeExecutable?: string;
   excludes?: string[];
   groups?: Group[];
 };
