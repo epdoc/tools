@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta.0] - 2025-10-13
+
+- Updated dependencies and fix unit tests
+
 ## [1.0.0-alpha.6] - 2025-10-12
 
 - Fixed issues with setting precise properties required for tests to run

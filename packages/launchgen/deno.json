@@ -1,14 +1,14 @@
 {
   "name": "@epdoc/launchgen",
   "description": "Generate a launch.json file for use with VSCode",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-beta.0",
   "author": {
     "name": "James Pravetz",
     "email": "jpravetz@epdoc.com"
   },
   "license": "MIT",
   "tasks": {
-    "test": "deno test -RW",
+    "test": "deno test -RWS --allow-run",
     "check": "deno check main.ts src test",
     "install": "deno install -f --global --name launchgen -A --config deno.json ./main.ts"
   },
@@ -18,7 +18,7 @@
     "@std/fmt": "jsr:@std/fmt@^1.0.8",
     "@std/fs": "jsr:@std/fs@^1.0.19",
     "@std/path": "jsr:@std/path@^1.1.2",
-    "@epdoc/fs": "jsr:@epdoc/fs@^0.2.24",
+    "@epdoc/fs": "jsr:@epdoc/fs@^0.2.27",
     "@epdoc/type": "jsr:@epdoc/type@^1.1.17",
     "@std/testing": "jsr:@std/testing@^1.0.16"
   },

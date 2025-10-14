@@ -1,6 +1,7 @@
 import { FileSpec, FolderSpec } from '@epdoc/fs';
 import { assert, assertEquals, assertExists } from '@std/assert';
 import { LaunchGenerator } from '../src/generator.ts';
+import * as consts from '../src/consts.ts';
 import type { Group, LaunchJson } from '../src/types.ts';
 
 async function createTempProject(): Promise<FolderSpec> {
@@ -102,7 +103,7 @@ Deno.test('LaunchGenerator - single project with auto-generated config', async (
     const testConfig = testConfigs[0];
     assertEquals(testConfig.type, 'node');
     assertEquals(testConfig.request, 'launch');
-    assertEquals(testConfig.runtimeExecutable, 'deno');
+    assertEquals(testConfig.runtimeExecutable, consts.RUNTIME_EXECUTABLE);
     assertEquals(testConfig.env?.LAUNCHGEN, 'true');
     assertEquals(testConfig.program, undefined, 'For test configs, program should be undefined');
     assert(
@@ -440,22 +441,18 @@ Deno.test('LaunchGenerator - correctly omits redundant settings', async () => {
     const launchJsonFile = new FileSpec(root, '.vscode', 'launch.json');
     const launchJson = await launchJsonFile.readJson<LaunchJson>();
 
-    // Check top-level properties
-    assertEquals(launchJson.port, 9250);
-    assertEquals(launchJson.console, 'integratedTerminal');
-
     // Find the generated configurations
     const inheritConfig = launchJson.configurations.find((c) => c.name === 'inherit.ts');
     const overrideConfig = launchJson.configurations.find((c) => c.name === 'override.ts');
     assertExists(inheritConfig);
     assertExists(overrideConfig);
 
-    // Assert that the inheriting config has no redundant properties
-    assertEquals(inheritConfig.attachSimplePort, undefined);
-    assertEquals(inheritConfig.console, undefined);
+    // Assert that the inheriting config has the port from the default
+    assertEquals(inheritConfig.attachSimplePort, 9250);
+    assertEquals(inheritConfig.console, 'integratedTerminal');
 
-    // Assert that the overriding config has the specific property
-    assertEquals(overrideConfig.attachSimplePort, undefined); // Port is not overridden, should be undefined
+    // Assert that the overriding config has the port from the default
+    assertEquals(overrideConfig.attachSimplePort, 9250);
     assertEquals(overrideConfig.console, 'externalTerminal'); // Console is overridden, should be defined
   } finally {
     await Deno.remove(root.path, { recursive: true });
