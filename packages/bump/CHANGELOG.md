@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.18] - 2025-10-13
+
+- Updated dependencies
+
 ## [0.3.17] - 2025-10-11
 
 - Added launch.config.json and README.md to list of allowed git changes outside of the workspace.

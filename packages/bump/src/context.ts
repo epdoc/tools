@@ -1,7 +1,8 @@
 import type * as CliApp from '@epdoc/cliapp';
 import * as Log from '@epdoc/logger';
+import type { Console } from '@epdoc/msgbuilder';
 
-type MsgBuilder = Log.MsgBuilder.Console.Builder;
+type MsgBuilder = Console.Builder;
 type Logger = Log.Std.Logger<MsgBuilder>;
 
 const logMgr: Log.Mgr<MsgBuilder> = new Log.Mgr<MsgBuilder>().init();

@@ -1,4 +1,3 @@
-
 import { assertEquals } from '@std/assert';
 import { Git } from '../src/git.ts';
 import { Context } from '../src/context.ts';
@@ -43,13 +42,13 @@ Deno.test('Git.add with workspace markdown files', async () => {
 
     // Check staged files
     const statusOutput = await git.runWithOutput(['status', '--porcelain']);
-    const stagedFiles = statusOutput.split('\n').filter(line => {
+    const stagedFiles = statusOutput.split('\n').filter((line) => {
       const trimmed = line.trim();
       return trimmed.startsWith('M') || trimmed.startsWith('A');
-    }).map(line => {
+    }).map((line) => {
       return line.trim().split(' ').pop() || '';
     });
-    
+
     assertEquals(stagedFiles.includes('packages/bump/README.md'), true);
     assertEquals(stagedFiles.includes('README.md'), true);
   } finally {

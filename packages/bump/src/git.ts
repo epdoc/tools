@@ -79,7 +79,7 @@ ${err}`);
     try {
       const output = await this.runWithOutput(['rev-parse', '--show-toplevel']);
       return output.trim();
-    } catch (err) {
+    } catch (_err) {
       this.#ctx.log.warn.warn('Not a git repository').emit();
     }
     return undefined;

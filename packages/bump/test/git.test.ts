@@ -44,13 +44,13 @@ Deno.test('Git.add with workspace files', async (t) => {
 
       // Check staged files
       const statusOutput = await git.runWithOutput(['status', '--porcelain']);
-      const stagedFiles = statusOutput.split('\n').filter(line => {
+      const stagedFiles = statusOutput.split('\n').filter((line) => {
         const trimmed = line.trim();
         return trimmed.startsWith('M') || trimmed.startsWith('A');
-      }).map(line => {
+      }).map((line) => {
         return line.trim().split(' ').pop() || '';
       });
-      
+
       assertEquals(stagedFiles.includes('packages/bump/deno.json'), true);
       assertEquals(stagedFiles.includes('deno.json'), true);
     });
@@ -74,13 +74,13 @@ Deno.test('Git.add with workspace files', async (t) => {
 
       // Check staged files
       const statusOutput = await git.runWithOutput(['status', '--porcelain']);
-      const stagedFiles = statusOutput.split('\n').filter(line => {
+      const stagedFiles = statusOutput.split('\n').filter((line) => {
         const trimmed = line.trim();
         return trimmed.startsWith('M') || trimmed.startsWith('A');
-      }).map(line => {
+      }).map((line) => {
         return line.trim().split(' ').pop() || '';
       });
-      
+
       assertEquals(stagedFiles.includes('packages/bump/README.md'), true);
       assertEquals(stagedFiles.includes('README.md'), true);
     });
@@ -106,17 +106,16 @@ Deno.test('Git.add with workspace files', async (t) => {
 
       // Check staged files
       const statusOutput = await git.runWithOutput(['status', '--porcelain']);
-      const stagedFiles = statusOutput.split('\n').filter(line => {
+      const stagedFiles = statusOutput.split('\n').filter((line) => {
         const trimmed = line.trim();
         return trimmed.startsWith('M') || trimmed.startsWith('A');
-      }).map(line => {
+      }).map((line) => {
         return line.trim().split(' ').pop() || '';
       });
-      
+
       assertEquals(stagedFiles.includes('packages/bump/somefile.ts'), true);
       assertEquals(stagedFiles.includes('docs/guide.md'), true);
     });
-
   } finally {
     Deno.chdir(originalCwd);
     await Deno.remove(tempDir, { recursive: true });
