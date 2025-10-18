@@ -177,7 +177,7 @@ export class LaunchGenerator {
           const port = group.port || config.port || 9229;
           const consoleType = group.console || config.console || consts.DEFAULT_CONSOLE;
 
-          const runtimeExecutable = group.runtimeExecutable || config.runtimeExecutable || consts.RUNTIME_EXECUTABLE;
+          const runtimeExecutable = group.runtimeExecutable || config.runtimeExecutable || Deno.execPath();
           const runtimeArgs = group.runtimeArgs || [];
           const programPath = '${workspaceFolder}/' + file.path.substring(this.#projectRoot.path.length + 1);
 
@@ -233,7 +233,7 @@ export class LaunchGenerator {
 
           const port = group.port || config.port || consts.DEFAULT_PORT;
           const consoleType = group.console || config.console || consts.DEFAULT_CONSOLE;
-          const runtimeExecutable = group.runtimeExecutable || config.runtimeExecutable || consts.RUNTIME_EXECUTABLE;
+          const runtimeExecutable = group.runtimeExecutable || config.runtimeExecutable || Deno.execPath();
 
           const runtimeArgs = group.runtimeArgs || consts.DEFAULT_PROGRAM_ARGS || [];
 
@@ -274,10 +274,10 @@ export class LaunchGenerator {
 
   async #writeLaunchJson(launchJson: LaunchJson): Promise<void> {
     if (this.#dryRun) {
-      const tempFile = await Deno.makeTempFile({ suffix: '.json' });
-      await Deno.writeTextFile(tempFile, JSON.stringify(launchJson, null, 2));
+      const fsTempFile = await FileSpec.makeTemp({ suffix: '.json' });
+      fsTempFile.writeJson(launchJson, null, 2);
       console.log(green('Dry run - would update'), this.#projectRoot.path + '/.vscode/launch.json');
-      console.log(green('Generated content written to:'), tempFile);
+      console.log(green('Generated content written to:'), fsTempFile.path);
       return;
     }
 
@@ -285,7 +285,7 @@ export class LaunchGenerator {
     await vscodeDirSpec.ensureDir();
 
     const launchFile = new FileSpec(vscodeDirSpec, 'launch.json');
-    await launchFile.writeJson(launchJson);
+    await launchFile.writeJson(launchJson, null, 2);
   }
 
   #isGenerated(config: LaunchConfiguration): boolean {

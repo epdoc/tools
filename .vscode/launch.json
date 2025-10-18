@@ -84,7 +84,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "launchgen: main.ts",
+      "name": "launchgen: main",
       "program": "${workspaceFolder}/packages/launchgen/./main.ts",
       "cwd": "${workspaceFolder}",
       "attachSimplePort": 9229,
@@ -105,7 +105,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "launchgen: main.ts -h",
+      "name": "launchgen: main --help",
       "program": "${workspaceFolder}/packages/launchgen/./main.ts",
       "cwd": "${workspaceFolder}",
       "attachSimplePort": 9229,
@@ -116,119 +116,13 @@
         "--inspect-brk"
       ],
       "args": [
-        "-h"
+        "--help"
       ],
       "env": {
         "LAUNCHGEN": "true"
       },
       "presentation": {
         "group": "launchgen"
-      }
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "launchgen: main.ts --init",
-      "program": "${workspaceFolder}/packages/launchgen/./main.ts",
-      "cwd": "${workspaceFolder}",
-      "attachSimplePort": 9229,
-      "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
-      "runtimeArgs": [
-        "run",
-        "-A",
-        "--inspect-brk"
-      ],
-      "args": [
-        "--init"
-      ],
-      "env": {
-        "LAUNCHGEN": "true"
-      },
-      "presentation": {
-        "group": "launchgen"
-      }
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "launchgen: main.ts -n",
-      "program": "${workspaceFolder}/packages/launchgen/./main.ts",
-      "cwd": "${workspaceFolder}",
-      "attachSimplePort": 9229,
-      "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
-      "runtimeArgs": [
-        "run",
-        "-A",
-        "--inspect-brk"
-      ],
-      "args": [
-        "-n"
-      ],
-      "env": {
-        "LAUNCHGEN": "true"
-      },
-      "presentation": {
-        "group": "launchgen"
-      }
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "bump: test/app.test.ts",
-      "cwd": "${workspaceFolder}",
-      "attachSimplePort": 9229,
-      "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
-      "env": {
-        "LAUNCHGEN": "true"
-      },
-      "runtimeArgs": [
-        "test",
-        "-A",
-        "--inspect-brk",
-        "${workspaceFolder}/packages/bump/test/app.test.ts"
-      ],
-      "presentation": {
-        "group": "bump"
-      }
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "bump: test/git.test.ts",
-      "cwd": "${workspaceFolder}",
-      "attachSimplePort": 9229,
-      "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
-      "env": {
-        "LAUNCHGEN": "true"
-      },
-      "runtimeArgs": [
-        "test",
-        "-A",
-        "--inspect-brk",
-        "${workspaceFolder}/packages/bump/test/git.test.ts"
-      ],
-      "presentation": {
-        "group": "bump"
-      }
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "bump: test/git-md.test.ts",
-      "cwd": "${workspaceFolder}",
-      "attachSimplePort": 9229,
-      "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
-      "env": {
-        "LAUNCHGEN": "true"
-      },
-      "runtimeArgs": [
-        "test",
-        "-A",
-        "--inspect-brk",
-        "${workspaceFolder}/packages/bump/test/git-md.test.ts"
-      ],
-      "presentation": {
-        "group": "bump"
       }
     },
     {

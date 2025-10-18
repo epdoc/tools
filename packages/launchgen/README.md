@@ -67,6 +67,8 @@ The tool reads configuration from two possible locations:
 1. **`deno.json`** - Add a `launch` property to your existing Deno config
 2. **`launch.config.json`** - Dedicated configuration file (takes precedence)
 
+If a `launch.config.json` file does not exist next to a `deno.json` file (either at the root or in a workspace), `launchgen` will automatically generate one. The content of the generated file depends on whether it's at the project root or in a workspace. See the "Auto-generation" section for more details.
+
 ### Basic Configuration Structure
 
 ```json
@@ -95,8 +97,8 @@ The tool reads configuration from two possible locations:
 
 ### Configuration Groups
 
-Groups define sets of related launch configurations. Each group can target files using `includes` patterns or a specific
-`program`.
+Groups define sets of related launch configurations. Each group can target files using `includes` and `excludes`
+patterns, or a specific `program`.
 
 #### File-Based Groups (using `includes`)
 
@@ -112,6 +114,9 @@ Groups define sets of related launch configurations. Each group can target files
 }
 ```
 
+`launchgen` will automatically use the `includes` and `exludes` list from your `deno.json` file's `test` property. You
+do not need to redeclare them.
+
 #### Program-Based Groups (using `program`)
 
 ```json
@@ -124,22 +129,79 @@ Groups define sets of related launch configurations. Each group can target files
 }
 ```
 
-### Group Properties Reference
+### Auto-generation
 
-| Property      | Type                     | Required | Description                                                      |
-| ------------- | ------------------------ | -------- | ---------------------------------------------------------------- |
-| `id`          | `string`                 | ✅       | Unique identifier for merging across files                       |
-| `name`        | `string`                 | ✅       | Display name and base for launch config names                    |
-| `includes`    | `string[]`               | *        | Glob patterns to find files (mutually exclusive with `program`)  |
-| `excludes`    | `string[]`               |          | Additional exclude patterns                                      |
-| `program`     | `string`                 | *        | Single executable file path (mutually exclusive with `includes`) |
-| `runtimeArgs` | `string[]`               |          | Deno runtime arguments                                           |
-| `scriptArgs`  | `string \| string[]`     |          | Default script arguments                                         |
-| `scripts`     | `(string \| string[])[]` |          | Argument variations (creates multiple configs)                   |
-| `port`        | `number`                 |          | Debug port (defaults to 9229)                                    |
-| `console`     | `string`                 |          | VS Code console type                                             |
+`launchgen` provides an auto-generation feature to get you started quickly. The behavior of auto-generation depends on
+the location of the `deno.json` file.
 
-*One of `includes` or `program` is required.
+#### Root Configuration
+
+If a `launch.config.json` file does not exist at the root of your project, `launchgen` will create one with a minimal
+configuration:
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/epdoc/tools/master/packages/launchgen/schemas/launch.schema.json",
+  "launch": {
+    "port": 9229,
+    "console": "internalConsole",
+    "excludes": [
+      "node_modules/**",
+      ".git/**",
+      "**/.*",
+      "**/.*/**"
+    ],
+    "runtimeExecutable": "/path/to/your/deno",
+    "groups": []
+  }
+}
+```
+
+This provides a base configuration that can be extended by individual workspaces.
+
+#### Workspace Configuration
+
+If a workspace (e.g., a directory in `packages/`) contains a `deno.json` file but no `launch.config.json`, `launchgen`
+will generate a full configuration for that workspace, including:
+
+- A **"Tests"** group for files ending in `.test.ts`.
+- A **"Runnable"** group for files ending in `.run.ts`.
+- Groups for any **runnable exports** defined in the workspace's `deno.json`.
+
+For example, if a workspace's `deno.json` has an export for `main.ts`, the generated `launch.config.json` will include a
+group for it with `""` and `"--help"` as default script variants, providing a convenient starting point for CLI tools.
+
+## launch.config.json Reference
+
+This file, or the `launch` property in `deno.json`, configures the behavior of `launchgen`.
+
+### Root Properties
+
+| Property            | Type       | Description                                                                                                                                         |
+| ------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `port`              | `number`   | _(Optional)_ The default debug port for all launch configurations. Defaults to `9229`.                                                              |
+| `console`           | `string`   | _(Optional)_ The default console type to use. Can be `internalConsole`, `integratedTerminal`, or `externalTerminal`. Defaults to `internalConsole`. |
+| `runtimeExecutable` | `string`   | _(Optional)_ The path to the Deno runtime executable. If not specified, it defaults to the path of the Deno executable that is running `launchgen`. |
+| `excludes`          | `string[]` | _(Optional)_ An array of glob patterns to exclude from all groups.                                                                                  |
+| `groups`            | `Group[]`  | _(Required)_ An array of configuration groups.                                                                                                      |
+
+### Group Properties
+
+| Property            | Type                     | Description                                                                                         |
+| ------------------- | ------------------------ | --------------------------------------------------------------------------------------------------- |
+| `id`                | `string`                 | _(Required)_ A unique identifier for the group, used for merging configurations.                    |
+| `name`              | `string`                 | _(Required)_ The display name for the group, used as a base for launch configuration names.         |
+| `includes`          | `string[]`               | _(*)_ An array of glob patterns to include files for this group. Mutually exclusive with `program`. |
+| `excludes`          | `string[]`               | _(Optional)_ An array of glob patterns to exclude files from this group.                            |
+| `program`           | `string`                 | _(*)_ The path to a single executable file. Mutually exclusive with `includes`.                     |
+| `runtimeExecutable` | `string`                 | _(Optional)_ The runtime executable to use for this group. Overrides the root `runtimeExecutable`.  |
+| `runtimeArgs`       | `string[]`               | _(Optional)_ An array of arguments to pass to the Deno runtime.                                     |
+| `scriptArgs`        | `string` or `string[]`   | _(Optional)_ Default arguments to pass to the script.                                               |
+| `scripts`           | `(string or string[])[]` | _(Optional)_ An array of script variations. Each entry creates a separate launch configuration.     |
+| `port`              | `number`                 | _(Optional)_ The debug port for this group. Overrides the root `port`.                              |
+| `console`           | `string`                 | _(Optional)_ The console type for this group. Overrides the root `console`.                         |
+
+_One of `includes` or `program` is required._
 
 ### Console Types
 
@@ -149,7 +211,7 @@ Groups define sets of related launch configurations. Each group can target files
 | `integratedTerminal` | VS Code integrated terminal     | Interactive apps, colored output |
 | `externalTerminal`   | External terminal window        | Complex terminal interactions    |
 
-### Debug Flags: `--inspect` vs `--inspect-brk`
+### runtimeArgs Flags: `--inspect` vs `--inspect-brk`
 
 Both flags enable debugging for Deno processes, but they behave differently:
 
@@ -250,6 +312,8 @@ The tool automatically creates configurations for executable exports in `deno.js
 
 This generates launch configurations for `cli` and `server` (excluding `mod.ts` files).
 
+When auto-generating a configuration for an export, `launchgen` will automatically include `""` and `"--help"` as script variants to provide a quick way to run the program with and without arguments.
+
 ### Complex Script Variations
 
 Create multiple launch configurations for different argument combinations:
@@ -271,7 +335,7 @@ Create multiple launch configurations for different argument combinations:
 
 ### Exclusion Patterns
 
-Default exclusions (automatically applied):
+Default exclusions (automatically included in `launch.config.json` file):
 
 - `node_modules/**` - Dependencies
 - `.git/**` - Git files
@@ -302,8 +366,8 @@ Add custom exclusions:
 my-project/
 ├── .vscode/
 │   └── launch.json          # Generated/updated by launchgen
-├── deno.json               # Root config with workspaces
-├── launch.config.json      # Optional dedicated config
+├── deno.json                # Root config with workspaces
+├── launch.config.json       # Optional dedicated config
 ├── packages/
 │   ├── api/
 │   │   ├── deno.json       # Workspace config
@@ -313,6 +377,7 @@ my-project/
 │   │       └── api.test.ts
 │   └── cli/
 │       ├── deno.json
+│       ├── launch.config.json # you can define all your launch groups here
 │       ├── src/
 │       │   └── main.ts
 │       └── tests/
@@ -370,27 +435,6 @@ Validate configurations in CI:
 # Check if configurations are up to date
 launchgen --dry-run
 ```
-
-## 🔄 Migration from v0.x
-
-Version 1.0.0 introduces several breaking changes:
-
-### Configuration Changes
-
-- **Workspace naming**: Now uses colon notation (`workspace: file`) instead of slash notation
-- **Exclusion patterns**: Enhanced default exclusions include `**/.*/**` for hidden directories
-- **Auto-generation**: Improved default configuration generation
-
-### CLI Changes
-
-- **New `--init` flag**: Force regenerate configuration files
-- **Enhanced `--dry-run`**: Better preview of changes
-
-### Behavior Changes
-
-- **Workspace grouping**: Visual grouping in VS Code debug dropdown
-- **Configuration merging**: Improved hierarchical merging logic
-- **File discovery**: Better glob pattern handling
 
 ## 🤝 Contributing
 

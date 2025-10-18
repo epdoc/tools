@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Launch Configuration",
+  "description": "Defines the structure of the `launch` property in `deno.json` or the content of `launch.config.json`.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "The URL of the JSON schema for this file."
+    },
+    "launch": {
+      "type": "object",
+      "description": "The root launch configuration object.",
+      "properties": {
+        "port": {
+          "type": "number",
+          "description": "The default debug port for all launch configurations.",
+          "default": 9229
+        },
+        "console": {
+          "type": "string",
+          "description": "The default console type to use.",
+          "default": "internalConsole"
+        },
+        "runtimeExecutable": {
+          "type": "string",
+          "description": "The default Deno runtime executable to use."
+        },
+        "excludes": {
+          "type": "array",
+          "description": "An array of glob patterns to exclude from all groups.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "groups": {
+          "type": "array",
+          "description": "An array of configuration groups.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "A unique identifier for the group, used for merging configurations."
+              },
+              "name": {
+                "type": "string",
+                "description": "The display name for the group, used as a base for launch configuration names."
+              },
+              "includes": {
+                "type": "array",
+                "description": "An array of glob patterns to include files for this group. Mutually exclusive with `program`.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "excludes": {
+                "type": "array",
+                "description": "An array of glob patterns to exclude files from this group.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "program": {
+                "type": "string",
+                "description": "The path to a single executable file. Mutually exclusive with `includes`."
+              },
+              "runtimeExecutable": {
+                "type": "string",
+                "description": "The runtime executable to use for this group. Overrides the root `runtimeExecutable`."
+              },
+              "runtimeArgs": {
+                "type": "array",
+                "description": "An array of arguments to pass to the Deno runtime.",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "scriptArgs": {
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "array", "items": { "type": "string" } }
+                ],
+                "description": "Default arguments to pass to the script."
+              },
+              "scripts": {
+                "type": "array",
+                "description": "An array of script variations. Each entry creates a separate launch configuration. An entry can be a string of arguments or an array of arguments.",
+                "items": {
+                  "oneOf": [
+                    { "type": "string" },
+                    { "type": "array", "items": { "type": "string" } }
+                  ]
+                }
+              },
+              "port": {
+                "type": "number",
+                "description": "The debug port for this group. Overrides the root `port`."
+              },
+              "console": {
+                "type": "string",
+                "description": "The console type for this group. Overrides the root `console`."
+              }
+            },
+            "required": ["id", "name"]
+          }
+        }
+      }
+    }
+  }
+}

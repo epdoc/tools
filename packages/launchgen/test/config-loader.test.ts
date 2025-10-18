@@ -43,7 +43,7 @@ describe('ConfigLoader', () => {
     }
   });
 
-  it('auto-generates config when none exists', async () => {
+  it('auto-generates minimal config at root', async () => {
     const tempDir = await createTempDir();
 
     try {
@@ -56,20 +56,64 @@ describe('ConfigLoader', () => {
       const configLoader = new ConfigLoader();
       const config = await configLoader.loadAndMerge(tempDir, false, true);
 
-      expect(config.groups).toHaveLength(2);
+      expect(config.groups).toHaveLength(0);
       expect(config.port).toBe(9229);
       expect(config.console).toBe('internalConsole');
 
-      const testGroup = config.groups?.find((g) => g.id === 'test');
-      const runGroup = config.groups?.find((g) => g.id === 'run');
-
-      expect(testGroup).toBeDefined();
-      expect(runGroup).toBeDefined();
-      expect(testGroup!.name).toBe('Tests');
-      expect(testGroup!.includes).toEqual(['**/*.test.ts']);
-
       const launchConfigFile = new FileSpec(tempDir, 'launch.config.json');
       expect(await launchConfigFile.getIsFile()).toBe(true);
+      const launchConfig = await launchConfigFile.readJson<{ launch: { groups: unknown[] } }>();
+      expect(launchConfig.launch.groups).toHaveLength(0);
+    } finally {
+      await Deno.remove(tempDir.path, { recursive: true });
+    }
+  });
+
+  it('auto-generates full config in workspace', async () => {
+    const tempDir = await createTempDir();
+
+    try {
+      const workspaceDir = new FolderSpec(tempDir, 'workspace');
+      await workspaceDir.ensureDir();
+      const denoJsonFile = new FileSpec(workspaceDir, 'deno.json');
+      await denoJsonFile.writeJson({
+        name: 'test-workspace',
+        version: '1.0.0',
+      });
+
+      const configLoader = new ConfigLoader();
+      const config = await configLoader.loadAndMerge(workspaceDir, false, false);
+
+      expect(config.groups).toHaveLength(2);
+      const testGroup = config.groups?.find((g) => g.id === 'test');
+      expect(testGroup).toBeDefined();
+    } finally {
+      await Deno.remove(tempDir.path, { recursive: true });
+    }
+  });
+
+  it('auto-generates config with exports and variants', async () => {
+    const tempDir = await createTempDir();
+
+    try {
+      const workspaceDir = new FolderSpec(tempDir, 'workspace');
+      await workspaceDir.ensureDir();
+      const denoJsonFile = new FileSpec(workspaceDir, 'deno.json');
+      await denoJsonFile.writeJson({
+        name: 'test-workspace',
+        version: '1.0.0',
+        exports: {
+          '.': './main.ts',
+        },
+      });
+
+      const configLoader = new ConfigLoader();
+      const config = await configLoader.loadAndMerge(workspaceDir, false, false);
+
+      expect(config.groups).toHaveLength(3); // test, run, and export
+      const exportGroup = config.groups?.find((g) => g.id === '.');
+      expect(exportGroup).toBeDefined();
+      expect(exportGroup?.scripts).toEqual(['', '--help']);
     } finally {
       await Deno.remove(tempDir.path, { recursive: true });
     }

@@ -78,38 +78,20 @@ Deno.test('LaunchGenerator - single project with auto-generated config', async (
     const generator = new LaunchGenerator(root);
     await generator.run();
 
-    // Check that launch.config.json was auto-generated
+    // Check that a minimal launch.config.json was auto-generated at the root
     const launchConfigFile = new FileSpec(root, 'launch.config.json');
     assertExists(await launchConfigFile.getIsFile());
 
     const launchConfig = await launchConfigFile.readJson() as { launch: { groups: Group[] } };
-    assertEquals(launchConfig.launch.groups.length, 2); // test and run groups
+    assertEquals(launchConfig.launch.groups.length, 0);
 
-    // Check that launch.json was created
+    // Check that launch.json was created but has no generated configurations
     const launchJsonFile = new FileSpec(root, '.vscode', 'launch.json');
     assertExists(await launchJsonFile.getIsFile());
 
     const launchJson = await launchJsonFile.readJson<LaunchJson>();
-    assertEquals(launchJson.version, '0.2.0');
-
-    // Should have configurations for test files and run files
-    const testConfigs = launchJson.configurations.filter((c) => c.name.includes('.test.ts'));
-    const runConfigs = launchJson.configurations.filter((c) => c.name.includes('.run.ts'));
-
-    assertEquals(testConfigs.length, 2); // 2 test files
-    assertEquals(runConfigs.length, 1); // 1 run file
-
-    // Verify configuration properties
-    const testConfig = testConfigs[0];
-    assertEquals(testConfig.type, 'node');
-    assertEquals(testConfig.request, 'launch');
-    assertEquals(testConfig.runtimeExecutable, consts.RUNTIME_EXECUTABLE);
-    assertEquals(testConfig.env?.LAUNCHGEN, 'true');
-    assertEquals(testConfig.program, undefined, 'For test configs, program should be undefined');
-    assert(
-      testConfig.runtimeArgs?.some((arg) => arg.includes('.test.ts')),
-      'runtimeArgs should include the test file path',
-    );
+    const generatedConfigs = launchJson.configurations.filter((c) => c.env?.LAUNCHGEN === 'true');
+    assertEquals(generatedConfigs.length, 0);
   } finally {
     await Deno.remove(root.path, { recursive: true });
   }
@@ -189,6 +171,7 @@ Deno.test('LaunchGenerator - custom groups with program and scripts', async () =
     assertEquals(helpConfig.attachSimplePort ?? launchJson.port, 9230);
     assertEquals(helpConfig.console ?? launchJson.console, 'integratedTerminal');
     assertEquals(helpConfig.args, ['--verbose', '--help']);
+    assertEquals(helpConfig.runtimeExecutable, Deno.execPath());
   } finally {
     await Deno.remove(root.path, { recursive: true });
   }
