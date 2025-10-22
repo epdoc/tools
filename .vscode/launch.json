@@ -128,6 +128,66 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "bump: test/app.test.ts",
+      "cwd": "${workspaceFolder}",
+      "attachSimplePort": 9229,
+      "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "runtimeArgs": [
+        "test",
+        "-A",
+        "--inspect-brk",
+        "${workspaceFolder}/packages/bump/test/app.test.ts"
+      ],
+      "presentation": {
+        "group": "bump"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "bump: test/git.test.ts",
+      "cwd": "${workspaceFolder}",
+      "attachSimplePort": 9229,
+      "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "runtimeArgs": [
+        "test",
+        "-A",
+        "--inspect-brk",
+        "${workspaceFolder}/packages/bump/test/git.test.ts"
+      ],
+      "presentation": {
+        "group": "bump"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "bump: test/git-md.test.ts",
+      "cwd": "${workspaceFolder}",
+      "attachSimplePort": 9229,
+      "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
+      "env": {
+        "LAUNCHGEN": "true"
+      },
+      "runtimeArgs": [
+        "test",
+        "-A",
+        "--inspect-brk",
+        "${workspaceFolder}/packages/bump/test/git-md.test.ts"
+      ],
+      "presentation": {
+        "group": "bump"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "bump: main",
       "program": "${workspaceFolder}/packages/bump/./main.ts",
       "cwd": "${workspaceFolder}",
@@ -135,7 +195,8 @@
       "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
       "runtimeArgs": [
         "run",
-        "-A"
+        "-A",
+        "--inspect-brk"
       ],
       "args": [],
       "env": {
@@ -148,17 +209,18 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "bump: main -h",
+      "name": "bump: main --help",
       "program": "${workspaceFolder}/packages/bump/./main.ts",
       "cwd": "${workspaceFolder}",
       "attachSimplePort": 9229,
       "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
       "runtimeArgs": [
         "run",
-        "-A"
+        "-A",
+        "--inspect-brk"
       ],
       "args": [
-        "-h"
+        "--help"
       ],
       "env": {
         "LAUNCHGEN": "true"
@@ -177,7 +239,8 @@
       "runtimeExecutable": "/Users/jpravetz/.deno/bin/deno",
       "runtimeArgs": [
         "run",
-        "-A"
+        "-A",
+        "--inspect-brk"
       ],
       "args": [
         "-n"

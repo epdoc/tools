@@ -314,6 +314,8 @@ This generates launch configurations for `cli` and `server` (excluding `mod.ts` 
 
 When auto-generating a configuration for an export, `launchgen` will automatically include `""` and `"--help"` as script variants to provide a quick way to run the program with and without arguments.
 
+`launchgen` determines if an export is "runnable" by checking the file path. It specifically ignores files named `mod.ts`, as these are conventionally used as the entry point for importable libraries, not executable applications. Any other exported file is considered runnable.
+
 ### Complex Script Variations
 
 Create multiple launch configurations for different argument combinations:

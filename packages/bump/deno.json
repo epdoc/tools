@@ -11,7 +11,7 @@
     ".": "./main.ts"
   },
   "tasks": {
-    "test": "deno test -RWS --allow-run",
+    "test": "deno test -RWSE --allow-run",
     "lint": "deno lint main.ts src test",
     "check": "deno check src main.ts test",
     "install": "deno install --global -A -f --config deno.json --name bump main.ts"
@@ -22,8 +22,8 @@
     ]
   },
   "imports": {
-    "@epdoc/cliapp": "jsr:@epdoc/cliapp@^1.0.0-beta.1",
-    "@epdoc/fs": "jsr:@epdoc/fs@^0.2.28",
+    "@epdoc/cliapp": "jsr:@epdoc/cliapp@^1.0.0-beta.2",
+    "@epdoc/fs": "jsr:@epdoc/fs@^1.0.0-alpha.5",
     "@epdoc/logger": "jsr:@epdoc/logger@^1003.0.0-beta.2",
     "@epdoc/msgbuilder": "jsr:@epdoc/msgbuilder@^0.0.1-beta.0",
     "@epdoc/type": "jsr:@epdoc/type@^1.1.17",
