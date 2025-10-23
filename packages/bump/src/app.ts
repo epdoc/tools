@@ -1,5 +1,5 @@
 import type * as CliApp from '@epdoc/cliapp';
-import { FileSpec, FolderSpec } from '@epdoc/fs';
+import * as FS from '@epdoc/fs/fs';
 import { _ } from '@epdoc/type';
 import { assert } from '@std/assert';
 import * as semver from 'semver';
@@ -14,8 +14,8 @@ export class AppMain {
     ctx: Ctx.Context,
     opts: App.Opts,
   ): Promise<void> {
-    const fsDenoFile = new FileSpec(Deno.cwd(), 'deno.json');
-    const isFile = await fsDenoFile.getIsFile();
+    const fsDenoFile = new FS.File(FS.cwd(), 'deno.json');
+    const isFile = await fsDenoFile.isFile();
     if (!isFile) {
       ctx.log.error.error('File does not exist').relative(fsDenoFile.path).emit();
       return;
@@ -31,12 +31,12 @@ export class AppMain {
       return;
     }
 
-    const folder = new FolderSpec(Deno.cwd());
-    const parent = new FolderSpec(folder.dirname);
+    const folder = FS.Folder.cwd();
+    const parent = new FS.Folder(folder.dirname);
     const workspaceName = folder.filename;
     let isWorkspace = await this.isWorkspace(parent);
     if (!isWorkspace) {
-      const parent2 = new FolderSpec(parent.dirname);
+      const parent2 = new FS.Folder(parent.dirname);
       isWorkspace = await this.isWorkspace(parent2);
     }
 
@@ -56,7 +56,7 @@ export class AppMain {
       }
       if (!opts.dryRun) {
         config.version = newVersion;
-        fsDenoFile.writeJson(config);
+        fsDenoFile.writeJson(config, null, 2);
         if (_.isNonEmptyArray(opts.changelog)) {
           const changelog = new Changelog(config.name);
           await changelog.update(newVersion, opts.changelog);
@@ -90,10 +90,10 @@ export class AppMain {
    * @returns A promise that resolves to a boolean indicating whether the module is in a workspace.
    */
   async isWorkspace(
-    folder: FolderSpec,
+    folder: FS.Folder,
   ): Promise<boolean> {
-    const fsDenoFile = new FileSpec(folder, 'deno.json');
-    const isFile = await fsDenoFile.getIsFile();
+    const fsDenoFile = new FS.File(folder, 'deno.json');
+    const isFile = await fsDenoFile.isFile();
     if (!isFile) {
       return false;
     }

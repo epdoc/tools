@@ -10,10 +10,14 @@ All notable changes to this project will be documented in this file.
 
 ### ✨ Features
 
-- **Improved Auto-generation**: `launch.config.json` is now generated with a minimal configuration at the project root and a full configuration in workspaces, promoting a cleaner project structure.
-- **Enhanced Export Handling**: Auto-generated configurations for exports in `deno.json` now include `""` and `"--help"` as default script variants, providing a better out-of-the-box experience for CLI tools.
-- **Smarter Runtime Detection**: `launchgen` now automatically detects the path of the Deno executable using `Deno.execPath()` and sets it as the default `runtimeExecutable` in all generated configurations.
-- **Pretty-printed JSON**: Auto-generated `launch.config.json` files are now formatted with 2-space indentation for improved readability.
+- **Improved Auto-generation**: `launch.config.json` is now generated with a minimal configuration at the project root
+  and a full configuration in workspaces, promoting a cleaner project structure.
+- **Enhanced Export Handling**: Auto-generated configurations for exports in `deno.json` now include `""` and `"--help"`
+  as default script variants, providing a better out-of-the-box experience for CLI tools.
+- **Smarter Runtime Detection**: `launchgen` now automatically detects the path of the Deno executable using
+  `Deno.execPath()` and sets it as the default `runtimeExecutable` in all generated configurations.
+- **Pretty-printed JSON**: Auto-generated `launch.config.json` files are now formatted with 2-space indentation for
+  improved readability.
 
 ### 📚 Documentation
 

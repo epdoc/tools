@@ -67,7 +67,9 @@ The tool reads configuration from two possible locations:
 1. **`deno.json`** - Add a `launch` property to your existing Deno config
 2. **`launch.config.json`** - Dedicated configuration file (takes precedence)
 
-If a `launch.config.json` file does not exist next to a `deno.json` file (either at the root or in a workspace), `launchgen` will automatically generate one. The content of the generated file depends on whether it's at the project root or in a workspace. See the "Auto-generation" section for more details.
+If a `launch.config.json` file does not exist next to a `deno.json` file (either at the root or in a workspace),
+`launchgen` will automatically generate one. The content of the generated file depends on whether it's at the project
+root or in a workspace. See the "Auto-generation" section for more details.
 
 ### Basic Configuration Structure
 
@@ -312,9 +314,12 @@ The tool automatically creates configurations for executable exports in `deno.js
 
 This generates launch configurations for `cli` and `server` (excluding `mod.ts` files).
 
-When auto-generating a configuration for an export, `launchgen` will automatically include `""` and `"--help"` as script variants to provide a quick way to run the program with and without arguments.
+When auto-generating a configuration for an export, `launchgen` will automatically include `""` and `"--help"` as script
+variants to provide a quick way to run the program with and without arguments.
 
-`launchgen` determines if an export is "runnable" by checking the file path. It specifically ignores files named `mod.ts`, as these are conventionally used as the entry point for importable libraries, not executable applications. Any other exported file is considered runnable.
+`launchgen` determines if an export is "runnable" by checking the file path. It specifically ignores files named
+`mod.ts`, as these are conventionally used as the entry point for importable libraries, not executable applications. Any
+other exported file is considered runnable.
 
 ### Complex Script Variations
 

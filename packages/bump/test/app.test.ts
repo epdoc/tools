@@ -1,6 +1,6 @@
+import * as Bump from '$bump';
 import { expect } from '@std/expect';
 import { describe, it } from '@std/testing/bdd';
-import * as Bump from '../src/mod.ts';
 
 const ctx = new Bump.Context();
 

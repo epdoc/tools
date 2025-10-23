@@ -1,7 +1,7 @@
-import { assertEquals } from '@std/assert';
-import { Git } from '../src/git.ts';
-import { Context } from '../src/context.ts';
 import { FolderSpec } from '@epdoc/fs';
+import { assertEquals } from '@std/assert';
+import { Context } from '../src/context.ts';
+import { Git } from '../src/git.ts';
 
 Deno.test('Git.add with workspace files', async (t) => {
   const tempDir = await Deno.makeTempDir();

@@ -1,9 +1,9 @@
-import { FileSpec } from '@epdoc/fs';
+import * as FS from '@epdoc/fs/fs';
 import { _ } from '@epdoc/type';
 import { format } from '@std/datetime';
 
 export class Changelog {
-  fs: FileSpec = new FileSpec(Deno.cwd(), 'CHANGELOG.md');
+  fs: FS.File = new FS.File(FS.cwd(), 'CHANGELOG.md');
   header: string;
 
   constructor(name: string) {
@@ -23,7 +23,7 @@ export class Changelog {
     }
     const newSection = [`## [${version}] - ${date}`, '', ...msgs];
 
-    const isFile = await this.fs.getIsFile();
+    const isFile = await this.fs.isFile();
     if (isFile) {
       const lines = await this.fs.readAsLines();
       const firstH2Index = lines.findIndex((line) => line.startsWith('## '));
