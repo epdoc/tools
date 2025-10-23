@@ -41,6 +41,7 @@
       "integrity": "5af705adfa010ef92be1faab95247edf356002a5a04278dfe7f37ca304065ea3",
       "dependencies": [
         "jsr:@epdoc/logger",
+        "jsr:@epdoc/msgbuilder",
         "jsr:@epdoc/type",
         "jsr:@std/fmt",
         "npm:commander"
@@ -83,11 +84,15 @@
       ]
     },
     "@epdoc/loglevels@0.0.1-alpha.11": {
-      "integrity": "7958e2625c2bcda1777d8e957ef172f449294add4403f2affad64c8b1c53d743"
+      "integrity": "7958e2625c2bcda1777d8e957ef172f449294add4403f2affad64c8b1c53d743",
+      "dependencies": [
+        "jsr:@epdoc/type"
+      ]
     },
     "@epdoc/msgbuilder@0.0.1-beta.0": {
       "integrity": "fc50e7afc90e15d62af25fc0855f40076850c32ce97bfaf10c00e30107cb3e19",
       "dependencies": [
+        "jsr:@epdoc/duration",
         "jsr:@epdoc/string",
         "jsr:@epdoc/type",
         "jsr:@std/fmt"

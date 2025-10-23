@@ -3,8 +3,8 @@ import { green, white } from '@std/fmt/colors';
 import { globToRegExp } from '@std/path/glob-to-regexp';
 import { ConfigLoader } from './config-loader.ts';
 import * as consts from './consts.ts';
-import { FileFinder } from './file-finder.ts';
 import type { DenoJson, Group, LaunchConfig, LaunchConfiguration, LaunchJson } from './types.ts';
+import { findFiles } from './utils.ts';
 
 export class LaunchGenerator {
   #projectRoot: FolderSpec;
@@ -64,7 +64,7 @@ export class LaunchGenerator {
 
   async #loadExistingLaunch(): Promise<LaunchJson> {
     const launchFile = new FileSpec(this.#projectRoot, '.vscode', 'launch.json');
-    if (await launchFile.getIsFile()) {
+    if (await launchFile.isFile()) {
       return await launchFile.readJson<LaunchJson>();
     }
     return { version: '0.2.0', configurations: [] };
@@ -76,10 +76,10 @@ export class LaunchGenerator {
 
     let workspacePatterns: string[] = [];
 
-    if (await denoJsonFile.getIsFile()) {
+    if (await denoJsonFile.isFile()) {
       const denoJson = await denoJsonFile.readJson<DenoJson>();
       workspacePatterns = denoJson.workspaces || denoJson.workspace || [];
-    } else if (await packageJsonFile.getIsFile()) {
+    } else if (await packageJsonFile.isFile()) {
       const packageJson = await packageJsonFile.readJson<{ workspaces?: string[] }>();
       workspacePatterns = packageJson.workspaces || [];
     }
@@ -106,7 +106,7 @@ export class LaunchGenerator {
         for (const regex of workspaceRegexes) {
           if (regex.test(relativePath)) {
             const denoJsonInWorkspace = new FileSpec(spec, 'deno.json');
-            if (await denoJsonInWorkspace.getIsFile()) {
+            if (await denoJsonInWorkspace.isFile()) {
               workspaces.push(spec);
               break;
             }
@@ -164,9 +164,8 @@ export class LaunchGenerator {
 
     for (const group of config.groups) {
       if (group.includes) {
-        const fileFinder = new FileFinder();
         const allExcludes = [...(config.excludes || []), ...(group.excludes || [])];
-        const files = await fileFinder.findFiles(workspace, group.includes, allExcludes);
+        const files = await findFiles(workspace, group.includes, allExcludes);
 
         for (const file of files) {
           const relativePath = file.path.substring(workspace.path.length + 1);

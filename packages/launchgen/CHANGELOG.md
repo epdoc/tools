@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta.2] - 2025-10-23
+
+- Modified `ConfigLoader` to differentiate between a true monorepo root (one with a `workspaces` property) and a
+  standalone project.
+- Auto-generation of `groups` now correctly runs for standalone projects, including default `test` and `run` groups, and
+  groups from `deno.json` exports.
+- Updated the test suite in `config-loader.test.ts` and `generator.test.ts` to reflect this corrected behavior.
+- Fixed a bug in the `executable exports auto-generation` test where missing files in the test setup caused an unhandled
+  exception.
+- Refactored file-finding logic from a class into a utility function.
+
 ## [1.0.0-beta.1] - 2025-10-18
 
 - feat(launchgen): improve auto-generation, runtime detection, and documentation

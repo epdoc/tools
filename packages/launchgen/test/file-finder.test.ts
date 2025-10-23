@@ -1,7 +1,7 @@
-import { describe, it } from '@std/testing/bdd';
-import { expect } from '@std/expect';
 import { FileSpec, FolderSpec } from '@epdoc/fs';
-import { FileFinder } from '../src/file-finder.ts';
+import { expect } from '@std/expect';
+import { describe, it } from '@std/testing/bdd';
+import { findFiles } from '../src/utils.ts';
 
 async function createTempDir(): Promise<FolderSpec> {
   const tempDir = await Deno.makeTempDir({ prefix: 'file_finder_test_' });
@@ -43,8 +43,7 @@ describe('FileFinder', () => {
     try {
       await createTestFileStructure(tempDir);
 
-      const fileFinder = new FileFinder();
-      const files = await fileFinder.findFiles(tempDir, ['**/*.test.ts']);
+      const files = await findFiles(tempDir, ['**/*.test.ts']);
 
       expect(files).toHaveLength(3);
 
@@ -65,8 +64,7 @@ describe('FileFinder', () => {
     try {
       await createTestFileStructure(tempDir);
 
-      const fileFinder = new FileFinder();
-      const files = await fileFinder.findFiles(tempDir, ['**/*.test.ts', '**/*.run.ts']);
+      const files = await findFiles(tempDir, ['**/*.test.ts', '**/*.run.ts']);
 
       expect(files).toHaveLength(4);
 
@@ -88,8 +86,7 @@ describe('FileFinder', () => {
     try {
       await createTestFileStructure(tempDir);
 
-      const fileFinder = new FileFinder();
-      const files = await fileFinder.findFiles(
+      const files = await findFiles(
         tempDir,
         ['**/*.test.*'],
         ['**/integration.*'],
@@ -114,8 +111,7 @@ describe('FileFinder', () => {
     try {
       await createTestFileStructure(tempDir);
 
-      const fileFinder = new FileFinder();
-      const files = await fileFinder.findFiles(
+      const files = await findFiles(
         tempDir,
         ['**/*.js'],
         ['node_modules/**'],
@@ -136,8 +132,7 @@ describe('FileFinder', () => {
     try {
       await createTestFileStructure(tempDir);
 
-      const fileFinder = new FileFinder();
-      const files = await fileFinder.findFiles(tempDir, ['src/**/*.ts']);
+      const files = await findFiles(tempDir, ['src/**/*.ts']);
 
       expect(files).toHaveLength(2);
 
@@ -157,8 +152,7 @@ describe('FileFinder', () => {
     try {
       await createTestFileStructure(tempDir);
 
-      const fileFinder = new FileFinder();
-      const files = await fileFinder.findFiles(tempDir, ['**/*.nonexistent']);
+      const files = await findFiles(tempDir, ['**/*.nonexistent']);
 
       expect(files).toHaveLength(0);
     } finally {
@@ -172,8 +166,7 @@ describe('FileFinder', () => {
     try {
       await createTestFileStructure(tempDir);
 
-      const fileFinder = new FileFinder();
-      const files = await fileFinder.findFiles(tempDir, []);
+      const files = await findFiles(tempDir, []);
 
       expect(files).toHaveLength(0);
     } finally {
@@ -207,10 +200,8 @@ describe('FileFinder', () => {
         await Deno.writeTextFile(file.path, `// ${filePath}`);
       }
 
-      const fileFinder = new FileFinder();
-
       // Find all test files but exclude e2e tests
-      const files = await fileFinder.findFiles(
+      const files = await findFiles(
         tempDir,
         ['**/*.test.*', '**/*.spec.*'],
         ['**/e2e/**'],

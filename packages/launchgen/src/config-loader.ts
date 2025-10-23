@@ -1,15 +1,16 @@
 import { FileSpec, type FolderSpec } from '@epdoc/fs';
+import { _ } from '@epdoc/type';
 import {
+  DEFAULT_CONSOLE,
+  DEFAULT_EXCLUDES,
+  DEFAULT_RUNTIME_ARGS,
+  DEFAULT_TEST_ARGS,
   DENO_JSON_FILE,
   LAUNCH_CONFIG_FILE,
-  DEFAULT_CONSOLE,
-  DEFAULT_TEST_ARGS,
-  DEFAULT_RUNTIME_ARGS,
-  DEFAULT_EXCLUDES,
-  RUNTIME_EXECUTABLE,
-  LAUNCH_SCHEMA_URL
+  LAUNCH_SCHEMA_URL,
 } from './consts.ts';
 import type { DenoJson, Group, LaunchConfig } from './types.ts';
+import { isMainEntryPoint } from './utils.ts';
 
 export class ConfigLoader {
   async loadAndMerge(workspaceDir: FolderSpec, forceRegenerate = false, isProjectRoot = false): Promise<LaunchConfig> {
@@ -19,15 +20,18 @@ export class ConfigLoader {
     let config: LaunchConfig = {};
 
     // Load from deno.json
-    if (await denoJsonFile.getIsFile()) {
+    const isDenoJsonAFile = await denoJsonFile.isFile();
+    let denoJsonHasLaunchProperty = false;
+    if (isDenoJsonAFile) {
       const denoJson = await denoJsonFile.readJson<DenoJson>();
       if (denoJson.launch) {
+        denoJsonHasLaunchProperty = true;
         config = { ...denoJson.launch };
       }
     }
 
     // Load and merge from launch.config.json
-    if (await launchConfigFile.getIsFile() && !forceRegenerate) {
+    if (await launchConfigFile.isFile() && !forceRegenerate) {
       const launchConfig = await launchConfigFile.readJson<{ launch: LaunchConfig }>();
       if (launchConfig.launch) {
         config = this.mergeConfigs(config, launchConfig.launch);
@@ -35,13 +39,12 @@ export class ConfigLoader {
     }
 
     // Auto-generate if no configuration exists or if forced
-    const shouldAutoGenerate = forceRegenerate || (!config.groups &&
-      !(await denoJsonFile.getIsFile() && await this.#hasLaunchProperty(denoJsonFile)));
+    const shouldAutoGenerate = forceRegenerate || (!config.groups && !(isDenoJsonAFile && denoJsonHasLaunchProperty));
 
     if (shouldAutoGenerate) {
       await this.#autoGenerateConfig(workspaceDir, denoJsonFile, isProjectRoot);
       // Reload the config after auto-generation
-      if (await launchConfigFile.getIsFile()) {
+      if (await launchConfigFile.isFile()) {
         const launchConfig = await launchConfigFile.readJson<{ launch: LaunchConfig }>();
         if (launchConfig.launch) {
           config = this.mergeConfigs(config, launchConfig.launch);
@@ -50,11 +53,6 @@ export class ConfigLoader {
     }
 
     return config;
-  }
-
-  async #hasLaunchProperty(denoJsonFile: FileSpec): Promise<boolean> {
-    const denoJson = await denoJsonFile.readJson<DenoJson>();
-    return !!denoJson.launch;
   }
 
   protected mergeConfigs(base: LaunchConfig, override: LaunchConfig): LaunchConfig {
@@ -84,7 +82,11 @@ export class ConfigLoader {
 
   async #autoGenerateConfig(workspaceDir: FolderSpec, denoJsonFile: FileSpec, isProjectRoot: boolean): Promise<void> {
     let groups: Group[] = [];
-    if (!isProjectRoot) {
+    const denoJson = await denoJsonFile.isFile() ? await denoJsonFile.readJson<DenoJson>() : {};
+    const isMonorepoRoot = isProjectRoot && ((denoJson.workspaces && denoJson.workspaces.length > 0) ||
+      (denoJson.workspace && denoJson.workspace.length > 0));
+
+    if (!isMonorepoRoot) {
       groups = [
         {
           id: 'test',
@@ -103,36 +105,52 @@ export class ConfigLoader {
       ];
 
       // Add executable exports
-      if (await denoJsonFile.getIsFile()) {
-        const denoJson = await denoJsonFile.readJson<DenoJson>();
-        if (denoJson.exports) {
-          for (const [key, filePath] of Object.entries(denoJson.exports)) {
-            if (!filePath.endsWith('mod.ts')) {
-              const name = key === '.' ? filePath.replace(/^\.\//, '').replace(/\.ts$/, '') : key;
-              groups.push({
-                id: key,
-                name: name,
-                console: DEFAULT_CONSOLE,
-                program: filePath,
-                runtimeArgs: DEFAULT_RUNTIME_ARGS,
-                scripts: ['', '--help'],
-              });
-            }
+      const exports = denoJson.exports;
+      const fsWorkspace = denoJsonFile.parentFolder();
+      if (_.isString(exports)) {
+        if (await isMainEntryPoint(new FileSpec(fsWorkspace, exports), fsWorkspace)) {
+          const name = exports.replace(/^\.\//, '').replace(/\.ts$/, '');
+          groups.push({
+            id: '.',
+            name: name,
+            console: DEFAULT_CONSOLE,
+            program: exports,
+            runtimeArgs: DEFAULT_RUNTIME_ARGS,
+            scripts: ['', '--help'],
+          });
+        }
+      } else if (_.isRecordStringString(exports)) {
+        for (const [key, filePath] of Object.entries(exports)) {
+          if (_.isString(filePath) && await isMainEntryPoint(new FileSpec(fsWorkspace, filePath), fsWorkspace)) {
+            const name = key === '.' ? filePath.replace(/^\.\//, '').replace(/\.ts$/, '') : key;
+            groups.push({
+              id: key,
+              name: name,
+              console: DEFAULT_CONSOLE,
+              program: filePath,
+              runtimeArgs: DEFAULT_RUNTIME_ARGS,
+              scripts: ['', '--help'],
+            });
           }
         }
       }
     }
 
-    const launchConfigFile = new FileSpec(workspaceDir, LAUNCH_CONFIG_FILE);
-    await launchConfigFile.writeJson({
+    const launchConfigData: { launch: LaunchConfig; '$schema'?: string } = {
       '$schema': LAUNCH_SCHEMA_URL,
       launch: {
-        port: 9229,
-        console: DEFAULT_CONSOLE,
-        excludes: DEFAULT_EXCLUDES,
-        runtimeExecutable: Deno.execPath(),
         groups: groups,
       },
-    }, null, 2);
+    };
+
+    if (isProjectRoot) {
+      launchConfigData.launch.port = 9229;
+      launchConfigData.launch.console = DEFAULT_CONSOLE;
+      launchConfigData.launch.excludes = DEFAULT_EXCLUDES;
+      launchConfigData.launch.runtimeExecutable = Deno.execPath();
+    }
+
+    const launchConfigFile = new FileSpec(workspaceDir, LAUNCH_CONFIG_FILE);
+    await launchConfigFile.writeJson(launchConfigData, null, 2);
   }
 }

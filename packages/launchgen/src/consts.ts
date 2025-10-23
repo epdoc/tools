@@ -5,7 +5,8 @@ export const LAUNCH_CONFIG_FILE = 'launch.config.json';
 export const LAUNCH_JSON_FILE = 'launch.json';
 export const DENO_JSON_FILE = 'deno.json';
 export const PACKAGE_JSON_FILE = 'package.json';
-export const LAUNCH_SCHEMA_URL = 'https://raw.githubusercontent.com/epdoc/tools/master/packages/launchgen/schemas/launch.schema.json';
+export const LAUNCH_SCHEMA_URL =
+  'https://raw.githubusercontent.com/epdoc/tools/master/packages/launchgen/schemas/launch.schema.json';
 export const HOME = os.homedir();
 export const RUNTIME_EXECUTABLE = `${HOME}/.deno/bin/deno`;
 export const DEFAULT_PORT = 9229;
