@@ -71,6 +71,11 @@ If a `launch.config.json` file does not exist next to a `deno.json` file (either
 `launchgen` will automatically generate one. The content of the generated file depends on whether it's at the project
 root or in a workspace. See the "Auto-generation" section for more details.
 
+> **Important:** Auto-generation runs only if `launch.config.json` is missing. Once the file is created, you are in
+> control. New test files or runnable scripts that match existing `includes` patterns will be picked up automatically.
+> However, if you add a new executable to `deno.json`'s `exports`, you must **manually add a corresponding group** to
+> `launch.config.json` or regenerate the file by running `launchgen --init`.
+
 ### Basic Configuration Structure
 
 ```json
@@ -317,9 +322,16 @@ This generates launch configurations for `cli` and `server` (excluding `mod.ts` 
 When auto-generating a configuration for an export, `launchgen` will automatically include `""` and `"--help"` as script
 variants to provide a quick way to run the program with and without arguments.
 
-`launchgen` determines if an export is "runnable" by checking the file path. It specifically ignores files named
-`mod.ts`, as these are conventionally used as the entry point for importable libraries, not executable applications. Any
-other exported file is considered runnable.
+`launchgen` determines if an export is "runnable" by inspecting the file. An exported file is considered runnable if it
+meets **any** of the following criteria:
+
+- It is named `main.ts` and located in the root of the workspace.
+- It contains a hashbang (shebang) line (e.g., `#!/usr/bin/env -S deno run`).
+- It uses the standard Deno pattern for executable scripts: `if (import.meta.main) { ... }` or
+  `assert(import.meta.main, ...)`.
+
+Files named `mod.ts` are always ignored, as they are conventionally used as entry points for importable libraries, not
+executable applications.
 
 ### Complex Script Variations
 

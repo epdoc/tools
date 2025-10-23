@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-beta.3] - 2025-10-23
+
+- Expanded search for import.meta.main to include assert as well as if
+
 ## [1.0.0-beta.2] - 2025-10-23
 
 - Modified `ConfigLoader` to differentiate between a true monorepo root (one with a `workspaces` property) and a

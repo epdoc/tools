@@ -126,7 +126,7 @@ export async function isMainEntryPoint(fsFile: FileSpec, fsWorkspace: FolderSpec
 
   // 2. Check for the 'if (import.meta.main)' pattern
   // This uses a regular expression to find the common check structure.
-  const mainCheckRegex = /if\s*\(\s*import\.meta\.main\s*\)/;
+  const mainCheckRegex = /(if|assert)\s*\(\s*import\.meta\.main\s*(,|\))/;
   const isMainCheckPresent = mainCheckRegex.test(fileContent);
 
   if (isMainCheckPresent) {
