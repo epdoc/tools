@@ -71,8 +71,11 @@ class Main {
 }
 
 const ctx = new Ctx.Context();
-const main = new Main(pkg);
-main.init();
 
-// Use CliApp utility run method that adds logging and error handling
-CliApp.run(ctx, () => main.run(ctx));
+if (import.meta.main) {
+  const main = new Main(pkg);
+  main.init();
+
+  // Use CliApp utility run method that adds logging and error handling
+  CliApp.run(ctx, () => main.run(ctx));
+}

@@ -5,7 +5,7 @@
     "jsr:@epdoc/datetime@^2.0.0-beta.4": "2.0.1",
     "jsr:@epdoc/datetime@^2.0.1": "2.0.1",
     "jsr:@epdoc/duration@~0.2.3": "0.2.3",
-    "jsr:@epdoc/fs@^1.0.0-alpha.8": "1.0.0-alpha.8",
+    "jsr:@epdoc/fs@^1.0.0-alpha.9": "1.0.0-alpha.9",
     "jsr:@epdoc/logger@^1003.0.0-beta.2": "1003.0.0-beta.2",
     "jsr:@epdoc/loglevels@^0.0.1-alpha.11": "0.0.1-alpha.11",
     "jsr:@epdoc/msgbuilder@^0.0.1-beta.0": "0.0.1-beta.0",
@@ -58,8 +58,8 @@
         "jsr:@epdoc/type"
       ]
     },
-    "@epdoc/fs@1.0.0-alpha.8": {
-      "integrity": "453d3c556229381e90f4a296c5ae4cc4ba2cf1cf681e81d8ace99f8fa9808b94",
+    "@epdoc/fs@1.0.0-alpha.9": {
+      "integrity": "648ac49803d6f0fef4a00aa205f9b29af5929c12e048eea400c9560b7908a7b1",
       "dependencies": [
         "jsr:@epdoc/datetime@^2.0.0-beta.4",
         "jsr:@epdoc/type",
@@ -217,7 +217,7 @@
       "packages/bump": {
         "dependencies": [
           "jsr:@epdoc/cliapp@^1.0.0-beta.2",
-          "jsr:@epdoc/fs@^1.0.0-alpha.8",
+          "jsr:@epdoc/fs@^1.0.0-alpha.9",
           "jsr:@epdoc/logger@^1003.0.0-beta.2",
           "jsr:@epdoc/msgbuilder@^0.0.1-beta.0",
           "jsr:@epdoc/type@^1.1.17",
@@ -231,7 +231,7 @@
       },
       "packages/launchgen": {
         "dependencies": [
-          "jsr:@epdoc/fs@^1.0.0-alpha.8",
+          "jsr:@epdoc/fs@^1.0.0-alpha.9",
           "jsr:@epdoc/type@^1.1.17",
           "jsr:@std/assert@^1.0.15",
           "jsr:@std/expect@^1.0.17",
