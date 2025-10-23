@@ -1,6 +1,6 @@
 {
   "name": "@epdoc/bump",
-  "version": "0.3.19",
+  "version": "0.3.20",
   "description": "Bump semver version in local deno.json file",
   "author": {
     "name": "James Pravetz",
@@ -24,7 +24,7 @@
   "imports": {
     "$bump": "./src/mod.ts",
     "@epdoc/cliapp": "jsr:@epdoc/cliapp@^1.0.0-beta.2",
-    "@epdoc/fs": "jsr:@epdoc/fs@^1.0.0-alpha.7",
+    "@epdoc/fs": "jsr:@epdoc/fs@^1.0.0-alpha.8",
     "@epdoc/logger": "jsr:@epdoc/logger@^1003.0.0-beta.2",
     "@epdoc/msgbuilder": "jsr:@epdoc/msgbuilder@^0.0.1-beta.0",
     "@epdoc/type": "jsr:@epdoc/type@^1.1.17",
